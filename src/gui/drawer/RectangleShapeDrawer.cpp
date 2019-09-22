@@ -1,6 +1,6 @@
 #include "RectangleShapeDrawer.h"
 
-Shape RectangleShapeDrawer::calcNextShape(ShapeProperties properties, Hotkey *hotkey, bool selected, long index) {
+Shape RectangleShapeDrawer::calcNextShape(ShapeProperties properties, Image *hotkey, bool selected, long index) {
     return Shape();
 }
 
@@ -13,12 +13,6 @@ Shape RectangleShapeDrawer::drawNextShape(ShapeProperties shapeProperties, Dimen
                    shapeProperties.dimensions.x, shapeProperties.dimensions.y);
 
     shape.position = *pos;
-
-    drawText(shapeProperties, shape);
-
-//    if(lastShapePosition != nullptr) {
-//        delete lastShapePosition;
-//    }
 
     lastShapePosition = pos;
     return shape;

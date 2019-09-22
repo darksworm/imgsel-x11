@@ -2,7 +2,7 @@
 
 #include <string>
 #include <set>
-#include "../../hotkey/hotkey.h"
+#include "../../image/image.h"
 #include "instruction/Instruction.h"
 #include "InputMode.h"
 

@@ -20,20 +20,20 @@ InputMode KeyFilteringInputHandler::getNextMode() {
     return InputMode::SELECTION;
 }
 
-std::function<bool(Hotkey *)> KeyFilteringInputHandler::getFilter() {
+std::function<bool(Image *)> KeyFilteringInputHandler::getFilter() {
     auto b = buffer;
 
-    return std::function<bool(Hotkey *hotkey)>(
-            [b](Hotkey *hotkey) {
-                for (auto &it : b) {
-                    std::string keyStr = keycode_linux_rawname(it);
-
-                    keyStr = linux_rawname_to_yaml_name(keyStr);
-
-                    if (hotkey->getKeyCodes()->find(keyStr) == hotkey->getKeyCodes()->end()) {
-                        return false;
-                    }
-                }
+    return std::function<bool(Image *hotkey)>(
+            [b](Image *hotkey) {
+//                for (auto &it : b) {
+//                    std::string keyStr = keycode_linux_rawname(it);
+//
+//                    keyStr = linux_rawname_to_yaml_name(keyStr);
+//
+//                    if (hotkey->getKeyCodes()->find(keyStr) == hotkey->getKeyCodes()->end()) {
+//                        return false;
+//                    }
+//                }
 
                 return true;
             }

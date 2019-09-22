@@ -2,7 +2,7 @@
 
 #include <linux/input-event-codes.h>
 #include "SelectionInputHandler.h"
-#include "../../gui/HotkeyPickerDrawer.h"
+#include "../../gui/ImagePickerDrawer.h"
 #include "instruction/MoveInstruction.h"
 #include "instruction/ModeChangeInstruction.h"
 
@@ -10,7 +10,7 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
     auto instruction = InputHandler::handleKeyPress(keyCode);
 
     if (instruction->getType() == InstructionType::NONE) {
-        HotkeyPickerMove move = HotkeyPickerMove::NONE;
+        ImagePickerMove move = ImagePickerMove::NONE;
 
         switch (keyCode) {
             case KEY_SLASH:
@@ -18,23 +18,23 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
                 instruction = new ModeChangeInstruction(InputMode::TEXT_FILTER);
                 break;
             case KEY_H:
-                move = HotkeyPickerMove::LEFT;
+                move = ImagePickerMove::LEFT;
                 break;
             case KEY_L:
-                move = HotkeyPickerMove::RIGHT;
+                move = ImagePickerMove::RIGHT;
                 break;
             case KEY_J:
-                move = HotkeyPickerMove::DOWN;
+                move = ImagePickerMove::DOWN;
                 break;
             case KEY_K:
-                move = HotkeyPickerMove::UP;
+                move = ImagePickerMove::UP;
                 break;
             default:
-                move = HotkeyPickerMove::NONE;
+                move = ImagePickerMove::NONE;
                 break;
         }
 
-        if (move != HotkeyPickerMove::NONE) {
+        if (move != ImagePickerMove::NONE) {
             delete instruction;
             instruction = new MoveInstruction(move, repeatNextCommandTimes);
         }
@@ -61,13 +61,13 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
         if (isModifierActive("SHIFT")) {
             if (repeatNextCommand) {
                 unsigned targetLine = repeatNextCommandTimes;
-                instruction = new MoveInstruction(HotkeyPickerMove::LINE, targetLine);
+                instruction = new MoveInstruction(ImagePickerMove::LINE, targetLine);
             } else {
-                instruction = new MoveInstruction(HotkeyPickerMove::END, 1);
+                instruction = new MoveInstruction(ImagePickerMove::END, 1);
             }
 
         } else {
-            instruction = new MoveInstruction(HotkeyPickerMove::HOME, 1);
+            instruction = new MoveInstruction(ImagePickerMove::HOME, 1);
         }
 
         repeatNextCommand = false;

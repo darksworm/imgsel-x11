@@ -10,9 +10,7 @@
 
 #include "gui/WindowManager.h"
 #include "lib/keycode/keycode.h"
-#include "hotkey/hotkeyloader_yaml.h"
 #include "gui/drawer/ShapeDrawerFactory.h"
-#include "gui/HotkeyPickerDrawer.h"
 
 #include "input/x11_keycodes.h"
 #include "input/handler/InputMode.h"
@@ -23,6 +21,40 @@
 #include "input/handler/instruction/FilterInstruction.h"
 #include "config/ConfigManager.h"
 
+#include <glob.h> // glob(), globfree()
+#include <vector>
+#include <stdexcept>
+#include <string>
+#include <sstream>
+
+std::vector<std::string> glob(const std::string& pattern) {
+    using namespace std;
+
+    // glob struct resides on the stack
+    glob_t glob_result;
+    memset(&glob_result, 0, sizeof(glob_result));
+
+    // do the glob operation
+    int return_value = glob(pattern.c_str(), GLOB_TILDE, NULL, &glob_result);
+    if(return_value != 0) {
+        globfree(&glob_result);
+        stringstream ss;
+        ss << "glob() failed with return_value " << return_value << endl;
+        throw std::runtime_error(ss.str());
+    }
+
+    // collect all the filenames into a std::list<std::string>
+    vector<string> filenames;
+    for(size_t i = 0; i < glob_result.gl_pathc; ++i) {
+        filenames.push_back(string(glob_result.gl_pathv[i]));
+    }
+
+    // cleanup
+    globfree(&glob_result);
+
+    // done
+    return filenames;
+}
 
 void drawText(WindowManager *windowManager, const std::string &text, Dimensions position) {
     XClearArea(
@@ -60,16 +92,18 @@ void drawText(WindowManager *windowManager, const std::string &text, Dimensions 
 }
 
 int main(int argc, char *argv[]) {
+    std::vector<std::string> imageFiles = glob(argv[1]);
     auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
 
-    std::vector<Hotkey> hotkeys;
-
-    // TODO: config manager?
-    load_hotkeys_dir("../static/conf.d/", &hotkeys);
+    std::vector<Image> images;
+    for(const auto& i:imageFiles) {
+        images.emplace_back(i);
+    }
 
     std::unique_ptr<WindowManager> windowManager(new WindowManager());
-    std::unique_ptr<HotkeyPickerDrawer> hotkeyPickerDrawer(
-            new HotkeyPickerDrawer(windowManager.get(), ShapeType::RECTANGLE, &hotkeys));
+    std::unique_ptr<ImagePickerDrawer> itemPickerDrawer(
+            new ImagePickerDrawer(windowManager.get(), &images)
+    );
 
     Display *display = windowManager->getDisplay();
     Window window = windowManager->getWindow();
@@ -115,9 +149,8 @@ int main(int argc, char *argv[]) {
     );
 
 
-
     XSelectInput(display, window, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask);
-    hotkeyPickerDrawer->drawFrame(&*hotkeys.begin());
+    itemPickerDrawer->drawFrame(&*images.begin());
 
     std::unique_ptr<InputHandler> inputHandler(nullptr);
 
@@ -149,9 +182,9 @@ int main(int argc, char *argv[]) {
 
                 case ConfigureNotify:
                     XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
-                    auto hk = hotkeyPickerDrawer->getSelectedHotkey() ? hotkeyPickerDrawer->getSelectedHotkey()
-                                                                      : &*hotkeys.begin();
-                    hotkeyPickerDrawer->drawFrame(hk);
+                    auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
+                                                                    : &*images.begin();
+                    itemPickerDrawer->drawFrame(hk);
                     break;
             }
         }
@@ -209,25 +242,25 @@ int main(int argc, char *argv[]) {
 
             XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
 
-            if (move != HotkeyPickerMove::NONE) {
-                moved = hotkeyPickerDrawer->move(moveInstruction->getMoveDirection(), moveInstruction->getMoveSteps());
+            if (move != ImagePickerMove::NONE) {
+                moved = itemPickerDrawer->move(moveInstruction->getMoveDirection(), moveInstruction->getMoveSteps());
             }
 
-            if (move == HotkeyPickerMove::NONE || !moved) {
-                hotkeyPickerDrawer->drawFrame(hotkeyPickerDrawer->getSelectedHotkey());
+            if (move == ImagePickerMove::NONE || !moved) {
+                itemPickerDrawer->drawFrame(itemPickerDrawer->getSelectedImage());
             }
         } else if (dynamic_cast<ModeChangeInstruction *>(instruction.get())) {
             state = ((ModeChangeInstruction *) (instruction.get()))->getNewMode();
 
-            hotkeyPickerDrawer->setFilter(nullptr);
+            itemPickerDrawer->setFilter(nullptr);
             XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
-            hotkeyPickerDrawer->drawFrame(nullptr);
+            itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<FilterInstruction *>(instruction.get())) {
             auto filterInstruction = ((FilterInstruction *) instruction.get());
 
-            hotkeyPickerDrawer->setFilter(filterInstruction->getFilter());
+            itemPickerDrawer->setFilter(filterInstruction->getFilter());
             XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
-            hotkeyPickerDrawer->drawFrame(nullptr);
+            itemPickerDrawer->drawFrame(nullptr);
 
             if (config->isIsDebug()) {
                 drawText(windowManager.get(), "QUERY: " + filterInstruction->getFilterString(), Dimensions(500, 100));
@@ -259,7 +292,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-//X Error of failed request:  BadMatch (invalid parameter attributes)
-//  Major opcode of failed request:  62 (X_CopyArea)
-//  Serial number of failed request:  38
-//  Current serial number in output stream:  40

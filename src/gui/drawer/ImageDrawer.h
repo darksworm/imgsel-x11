@@ -1,8 +1,9 @@
 #pragma once
 
+#include <string>
 #include "ShapeDrawer.h"
 
-class RectangleShapeDrawer : public ShapeDrawer {
+class ImageDrawer : public ShapeDrawer {
 protected:
     Shape calcNextShape(ShapeProperties properties, Image *hotkey, bool selected, long index) override;
 
@@ -13,5 +14,8 @@ protected:
     XPoint *getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) override;
 
 public:
-    explicit RectangleShapeDrawer(WindowManager *windowManager) : ShapeDrawer(windowManager) {}
+    ImageDrawer(WindowManager *windowManager) : ShapeDrawer(windowManager) {};
 };
+
+
+

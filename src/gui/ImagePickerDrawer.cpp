@@ -1,23 +1,22 @@
 #include <utility>
 
-#include "HotkeyPickerDrawer.h"
+#include "ImagePickerDrawer.h"
 #include "../exceptions/OutOfBounds.h"
 #include "dimensions.h"
 #include <memory>
 
-HotkeyPickerDrawer::HotkeyPickerDrawer(WindowManager *windowManager, ShapeType shapeType,
-                                       std::vector<Hotkey> *hotkeys) {
+ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager,  std::vector<Image> *hotkeys) {
     this->windowManager = windowManager;
     this->page = 0;
     this->selectedShape = nullptr;
     this->hotkeys = hotkeys;
 
-    shapeDrawer = ShapeDrawerFactory::getShapeDrawer(shapeType, windowManager);
+    shapeDrawer = ShapeDrawerFactory::getShapeDrawer(ShapeType::IMAGE, windowManager);
     shapeProperties = shapeDrawer->calcShapeProps(windowManager->getWindow());
 }
 
-void HotkeyPickerDrawer::drawFrame(Hotkey *selectedHotkey) {
-    auto start = getPageHotkeyStart();
+void ImagePickerDrawer::drawFrame(Image *selectedImage) {
+    auto start = getPageImageStart();
 
     shapes.clear();
     shapeDrawer->lastShapePosition = nullptr;
@@ -33,11 +32,11 @@ void HotkeyPickerDrawer::drawFrame(Hotkey *selectedHotkey) {
             continue;
         }
 
-        if(selectedHotkey == nullptr){
-            selectedHotkey = &*it;
+        if(selectedImage == nullptr){
+            selectedImage = &*it;
         }
 
-        bool selected =  &*it == selectedHotkey;
+        bool selected =  &*it == selectedImage;
 
         Shape shape{
                 .selected = selected,
@@ -59,7 +58,7 @@ void HotkeyPickerDrawer::drawFrame(Hotkey *selectedHotkey) {
     }
 }
 
-std::vector<Hotkey>::iterator HotkeyPickerDrawer::getPageHotkeyStart() {
+std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
     int hotkeysPerPage = shapeProperties.itemCounts.y * shapeProperties.itemCounts.x;
 
     if (page > 0 && hotkeys->size() < hotkeysPerPage) {
@@ -87,55 +86,55 @@ std::vector<Hotkey>::iterator HotkeyPickerDrawer::getPageHotkeyStart() {
 //    }
 }
 
-int HotkeyPickerDrawer::getHotkeyPage(long index) {
+int ImagePickerDrawer::getImagePage(long index) {
     return (int) (index / (this->shapeProperties.itemCounts.x * this->shapeProperties.itemCounts.y));
 }
 
-void HotkeyPickerDrawer::goToHotkey(long hotkeyIdx) {
-    Hotkey *hotkey = &*(hotkeys->begin() + hotkeyIdx);
+void ImagePickerDrawer::goToImage(long hotkeyIdx) {
+    Image *hotkey = &*(hotkeys->begin() + hotkeyIdx);
 
-    page = getHotkeyPage(hotkeyIdx);
+    page = getImagePage(hotkeyIdx);
     drawFrame(hotkey);
 }
 
-bool HotkeyPickerDrawer::move(HotkeyPickerMove move, unsigned int steps) {
+bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
     bool canMove = false;
     long newSelectedShapeIdx = 0;
 
     char *debug;
 
     switch (move) {
-        case HotkeyPickerMove::LEFT:
+        case ImagePickerMove::LEFT:
             canMove = selectedShape->index >= steps;
             newSelectedShapeIdx = selectedShape->index - steps;
             debug = "LEFT";
             break;
-        case HotkeyPickerMove::RIGHT:
+        case ImagePickerMove::RIGHT:
             canMove = selectedShape->index + steps < hotkeys->size();
             newSelectedShapeIdx = selectedShape->index + steps;
             debug = "RIGHT";
             break;
-        case HotkeyPickerMove::UP:
+        case ImagePickerMove::UP:
             canMove = selectedShape->index - (steps * shapeProperties.itemCounts.x) >= 0;
             newSelectedShapeIdx = selectedShape->index - (steps * shapeProperties.itemCounts.x);
             debug = "UP";
             break;
-        case HotkeyPickerMove::DOWN:
+        case ImagePickerMove::DOWN:
             canMove = selectedShape->index + (steps * shapeProperties.itemCounts.x) < hotkeys->size();
             newSelectedShapeIdx = selectedShape->index + (steps * shapeProperties.itemCounts.x);
             debug = "DOWN";
             break;
-        case HotkeyPickerMove::END:
+        case ImagePickerMove::END:
             canMove = selectedShape->index != hotkeys->size() - 1;
             newSelectedShapeIdx = hotkeys->size() - 1;
             debug = "END";
             break;
-        case HotkeyPickerMove::HOME:
+        case ImagePickerMove::HOME:
             canMove = true;
             newSelectedShapeIdx = 0;
             debug = "HOME";
             break;
-        case HotkeyPickerMove::LINE:
+        case ImagePickerMove::LINE:
             canMove = steps > 0 && shapeProperties.itemCounts.x * steps < hotkeys->size();
             newSelectedShapeIdx = shapeProperties.itemCounts.x * (steps - 1);
             debug = "LINE";
@@ -145,16 +144,16 @@ bool HotkeyPickerDrawer::move(HotkeyPickerMove move, unsigned int steps) {
            (int) newSelectedShapeIdx);
 
     if (canMove) {
-        goToHotkey(newSelectedShapeIdx);
+        goToImage(newSelectedShapeIdx);
     }
 
     return canMove;
 }
 
-Hotkey *HotkeyPickerDrawer::getSelectedHotkey() {
+Image *ImagePickerDrawer::getSelectedImage() {
     return selectedShape->hotkey;
 }
 
-void HotkeyPickerDrawer::setFilter(std::function<bool(Hotkey *)> filter) {
+void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter) {
     this->filter = std::move(filter);
 }

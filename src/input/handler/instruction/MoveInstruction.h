@@ -1,17 +1,17 @@
 
 #include "Instruction.h"
-#include "../../../gui/HotkeyPickerDrawer.h"
+#include "../../../gui/ImagePickerDrawer.h"
 
 class MoveInstruction : public Instruction {
 private:
-    HotkeyPickerMove moveDirection;
+    ImagePickerMove moveDirection;
     unsigned int moveSteps = 1;
 public:
-    HotkeyPickerMove getMoveDirection() {
+    ImagePickerMove getMoveDirection() {
         return this->moveDirection;
     }
 
-    explicit MoveInstruction(HotkeyPickerMove moveDirection, unsigned int moveSteps) : Instruction(InstructionType::MOVE),
+    explicit MoveInstruction(ImagePickerMove moveDirection, unsigned int moveSteps) : Instruction(InstructionType::MOVE),
                                                                     moveDirection(moveDirection), moveSteps(moveSteps) {}
 
     unsigned int getMoveSteps() const {

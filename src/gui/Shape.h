@@ -1,7 +1,7 @@
 #pragma once
 
 #include <X11/Xutil.h>
-#include "../hotkey/hotkey.h"
+#include "../image/image.h"
 #include "dimensions.h"
 
 struct ShapeProperties {
@@ -20,6 +20,6 @@ struct Shape {
     bool selected;
     long index;
 
-    Hotkey *hotkey;
+    Image *hotkey;
 };
 

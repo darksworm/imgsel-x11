@@ -7,7 +7,7 @@ class TextFilteringInputHandler : public FilteringInputHandler {
 public:
     std::string getFilterText() override;
 
-    std::function<bool(Hotkey *)> getFilter() override;
+    std::function<bool(Image *)> getFilter() override;
 
     InputMode getNextMode() override;
 

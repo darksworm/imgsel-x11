@@ -1,5 +1,5 @@
 ---
-title: Hotkey selection tool questions and answers
+title: Image selection tool questions and answers
 author: Ilmars
 output: md_document
 ---

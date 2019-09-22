@@ -15,7 +15,7 @@ InputMode TextFilteringInputHandler::getNextMode() {
     return InputMode::KEY_FILTER;
 }
 
-std::function<bool(Hotkey *)> TextFilteringInputHandler::getFilter() {
+std::function<bool(Image *)> TextFilteringInputHandler::getFilter() {
     auto bufferString = bufferToString();
 
     auto upperCase = [](std::string input) {
@@ -26,15 +26,16 @@ std::function<bool(Hotkey *)> TextFilteringInputHandler::getFilter() {
 
     /** mom, look at me im using lambdas
      AKA refactor me please */
-    return std::function<bool(Hotkey *hotkey)>(
-            [bufferString, upperCase](Hotkey *hotkey) {
+    return std::function<bool(Image *hotkey)>(
+            [bufferString, upperCase](Image *hotkey) {
                 auto str = upperCase(bufferString);
 
-                if (upperCase(hotkey->getDescription()).find(str) != std::string::npos) {
-                    return true;
-                }
-
-                return upperCase(hotkey->getDescription()).find(str) != std::string::npos;
+                return false;
+//                if (upperCase(hotkey->getDescription()).find(str) != std::string::npos) {
+//                    return true;
+//                }
+//
+//                return upperCase(hotkey->getDescription()).find(str) != std::string::npos;
             }
     );
 }

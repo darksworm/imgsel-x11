@@ -6,19 +6,19 @@
 #pragma once
 
 #include "Instruction.h"
-#include "../../../hotkey/hotkey.h"
+#include "../../../image/image.h"
 
 class FilterInstruction : public Instruction {
 private:
-    std::function<bool(Hotkey *hotkey)> filterFunc;
+    std::function<bool(Image *hotkey)> filterFunc;
     std::string filterString;
 public:
-    explicit FilterInstruction(std::function<bool(Hotkey *hotkey)> filterFunc, std::string filterString) : Instruction(
+    explicit FilterInstruction(std::function<bool(Image *hotkey)> filterFunc, std::string filterString) : Instruction(
             InstructionType::FILTER), filterString(std::move(filterString)) {
         this->filterFunc = std::move(filterFunc);
     }
 
-    std::function<bool(Hotkey *)> getFilter() {
+    std::function<bool(Image *)> getFilter() {
         return filterFunc;
     }
 

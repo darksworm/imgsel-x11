@@ -3,7 +3,8 @@
 #include "RectangleShapeDrawer.h"
 
 enum class ShapeType {
-    RECTANGLE
+    RECTANGLE,
+    IMAGE
 };
 
 class ShapeDrawerFactory {
