@@ -66,19 +66,20 @@ void WindowManager::newWindow() {
     int height = screen->height;
     int width = screen->width;
 
-    XVisualInfo vinfo;
-    XMatchVisualInfo(display, DefaultScreen(display), 32, TrueColor, &vinfo);
+    XMatchVisualInfo(display, DefaultScreen(display), getDepth(), TrueColor, &vInfo);
 
+    colorMap = XCreateColormap(display, DefaultRootWindow(display), vInfo.visual, AllocNone);
+    
     XSetWindowAttributes attr;
-    attr.colormap = XCreateColormap(display, DefaultRootWindow(display), vinfo.visual, AllocNone);
+    attr.colormap = colorMap;
     attr.border_pixel = 0;
     // TODO : this should be 0 to be transparent
     attr.background_pixel = RGBA2DWORD(0, 0, 0, 115);
 
     // when setting y to 0, in i3 the window appears in a negative y position, 1 works tho
     this->window = XCreateWindow(display, DefaultRootWindow(display), 0, 1, (unsigned) width, (unsigned) height - 1, 0,
-                               vinfo.depth, InputOutput,
-                               vinfo.visual, CWColormap | CWBorderPixel | CWBackPixel | FocusChangeMask, &attr);
+                               vInfo.depth, InputOutput,
+                               vInfo.visual, CWColormap | CWBorderPixel | CWBackPixel | FocusChangeMask, &attr);
 
     this->setWindowSettings();
 }
@@ -104,4 +105,8 @@ void WindowManager::getWindowDimensions(unsigned int *width, unsigned int *heigh
     Window root;
 
     XGetGeometry(display, window, &root, &empty, &empty, width, height, &u_empty, &u_empty);
+}
+
+int WindowManager::getDepth() {
+    return 32;
 }

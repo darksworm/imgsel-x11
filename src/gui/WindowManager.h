@@ -13,6 +13,8 @@ private:
 
     Display* display = nullptr;
     Window window;
+    XVisualInfo vInfo;
+    Colormap colorMap;
 public:
     Window getWindow();
     Display* getDisplay();
@@ -20,4 +22,14 @@ public:
     void getWindowDimensions(unsigned int* width, unsigned int* height);
 
     void destroyWindow();
+
+    int getDepth();
+
+    Visual* getVisual() {
+        return vInfo.visual;
+    }
+
+    Colormap getColorMap() {
+        return colorMap;
+    }
 };
