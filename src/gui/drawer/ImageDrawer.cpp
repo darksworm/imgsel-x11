@@ -24,33 +24,14 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     pix = XCreatePixmap(windowManager->getDisplay(), windowManager->getWindow(), width, height,
                         windowManager->getDepth());
 
+
     imlib_context_set_display(windowManager->getDisplay());
     imlib_context_set_visual(windowManager->getVisual());
     imlib_context_set_colormap(windowManager->getColorMap());
     imlib_context_set_drawable(windowManager->getWindow());
-    imlib_context_set_drawable(pix);
-
-    imlib_render_image_on_drawable(0, 0);
-
-    auto gc = XCreateGC(
-            windowManager->getDisplay(),
-            pix,
-            0,
-            nullptr
-    );
 
     XPoint *pos = getNextShapePosition(shapeProperties, windowDimensions);
-
-    XCopyArea(
-            windowManager->getDisplay(),
-            pix,
-            windowManager->getWindow(),
-            gc,
-            0, 0,
-            width, height,
-            pos->x,
-            pos->y
-    );
+    imlib_render_image_on_drawable(pos->x, pos->y);
 
     shape.position = *pos;
     lastShapePosition = pos;
