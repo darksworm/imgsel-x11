@@ -1,9 +1,8 @@
 #pragma once
 
-#include "RectangleShapeDrawer.h"
+#include "ImageDrawer.h"
 
 enum class ShapeType {
-    RECTANGLE,
     IMAGE
 };
 

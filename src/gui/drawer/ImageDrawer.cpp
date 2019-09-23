@@ -45,18 +45,9 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     // TODO: calculate dynamically
     ShapeProperties shapeProperties{
-            .dimensions = Dimensions{
-                    .x = 300,
-                    .y = 150,
-            },
-            .margins = Dimensions{
-                    .x = 20,
-                    .y = 20,
-            },
-            .itemCounts = Dimensions{
-                    .x = 4,
-                    .y = 4,
-            },
+            .dimensions = Dimensions(300,150),
+            .margins = Dimensions(20,20),
+            .itemCounts = Dimensions(4,4),
             .topTextRect = XRectangle{
                     .x = 10,
                     .y = 20,
