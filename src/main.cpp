@@ -1,10 +1,8 @@
 #include <iostream>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <yaml-cpp/yaml.h>
 #include <thread>
-#include <termcap.h>
 #include <X11/extensions/XTest.h>
 #include <Imlib2.h>
 
