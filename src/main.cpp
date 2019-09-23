@@ -95,9 +95,21 @@ int main(int argc, char *argv[]) {
     std::vector<std::string> imageFiles = glob(argv[1]);
     auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
 
+    std::vector<std::string> imageExtensions = {
+        "jpg",
+        "jpeg",
+        "png",
+        "gif"
+    };
+
     std::vector<Image> images;
-    for(const auto& i:imageFiles) {
-        images.emplace_back(i);
+    for(const auto& img:imageFiles) {
+        for(const auto& ext:imageExtensions) {
+            if (0 == img.compare(img.length() - ext.length(), ext.length(), ext)) {
+                images.emplace_back(img);
+                break;
+            }
+        }
     }
 
     std::unique_ptr<WindowManager> windowManager(new WindowManager());
