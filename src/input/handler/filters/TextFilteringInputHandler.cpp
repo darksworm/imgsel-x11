@@ -29,13 +29,14 @@ std::function<bool(Image *)> TextFilteringInputHandler::getFilter() {
     return std::function<bool(Image *hotkey)>(
             [bufferString, upperCase](Image *hotkey) {
                 auto str = upperCase(bufferString);
+                auto fileName = hotkey->getPath();
+                auto lastSlashPos = fileName.find_last_of('/');
 
-                return false;
-//                if (upperCase(hotkey->getDescription()).find(str) != std::string::npos) {
-//                    return true;
-//                }
-//
-//                return upperCase(hotkey->getDescription()).find(str) != std::string::npos;
+                if(lastSlashPos != std::string::npos) {
+                    fileName = fileName.substr(lastSlashPos + 1);
+                }
+
+                return upperCase(fileName).find(str) != std::string::npos;
             }
     );
 }
