@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (config->isIsDebug()) {
-            static const char *inputModes[] = {"SELECTION", "KEY_FILTER", "TEXT_FILTER"};
+            static const char *inputModes[] = {"SELECTION", "TEXT_FILTER"};
             drawText(windowManager.get(), inputModes[(int) state], Dimensions(100, 100));
         }
     }
