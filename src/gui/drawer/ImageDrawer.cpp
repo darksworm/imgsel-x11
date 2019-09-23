@@ -38,6 +38,8 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 
     imlib_free_image();
     XFreePixmap(windowManager->getDisplay(), pix);
+
+    return shape;
 }
 
 ShapeProperties ImageDrawer::calcShapeProps(Window window) {
