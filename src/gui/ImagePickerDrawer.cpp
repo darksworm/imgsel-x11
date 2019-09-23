@@ -41,7 +41,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
         Shape shape{
                 .selected = selected,
                 .index = std::distance(hotkeys->begin(), it),
-                .hotkey = &*it
+                .image = &*it
         };
 
         shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
@@ -151,7 +151,11 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
 }
 
 Image *ImagePickerDrawer::getSelectedImage() {
-    return selectedShape->hotkey;
+    if(selectedShape != nullptr) {
+        return selectedShape->image;
+    } else {
+        return nullptr;
+    }
 }
 
 void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter) {

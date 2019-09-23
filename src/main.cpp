@@ -127,40 +127,6 @@ int main(int argc, char *argv[]) {
     int keep_running = 1;
     XEvent event;
 
-    Imlib_Image img;
-    Pixmap pix;
-    int width, height;
-    const char *filename = "doge.png";
-
-    img = imlib_load_image(filename);
-    if (!img) {
-        fprintf(stderr, "%s:Unable to load image\n", filename);
-        return 0;
-    }
-    imlib_context_set_image(img);
-    width = imlib_image_get_width();
-    height = imlib_image_get_height();
-
-
-    pix = XCreatePixmap(windowManager->getDisplay(), windowManager->getWindow(), width, height, windowManager->getDepth());
-
-    imlib_context_set_display(windowManager->getDisplay());
-    imlib_context_set_visual(windowManager->getVisual());
-    imlib_context_set_colormap(windowManager->getColorMap());
-    imlib_context_set_drawable(windowManager->getWindow());
-    imlib_context_set_drawable(pix);
-
-    imlib_render_image_on_drawable(0, 0);
-
-
-    auto gc = XCreateGC(
-            windowManager->getDisplay(),
-            pix,
-            0,
-            nullptr
-    );
-
-
     XSelectInput(display, window, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | StructureNotifyMask);
     itemPickerDrawer->drawFrame(&*images.begin());
 
@@ -208,15 +174,6 @@ int main(int argc, char *argv[]) {
         */
         std::this_thread::sleep_for(std::chrono::nanoseconds(16600000));
 
-        XCopyArea(
-            windowManager->getDisplay(),
-            pix,
-            windowManager->getWindow(),
-            gc,
-            0, 0,
-            width, height,
-            0, 0
-            );
 
         if (keyCode == 0) {
             continue;

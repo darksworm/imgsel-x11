@@ -20,6 +20,6 @@ struct Shape {
     bool selected;
     long index;
 
-    Image *hotkey;
+    Image *image;
 };
 
