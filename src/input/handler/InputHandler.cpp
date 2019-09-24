@@ -1,9 +1,8 @@
 #include <linux/input-event-codes.h>
 #include "InputHandler.h"
 #include "instruction/ModeChangeInstruction.h"
-#include "SelectionInputHandler.h"
-#include "filters/TextFilteringInputHandler.h"
 #include "../../lib/keycode/keycode.h"
+#include "instruction/CopyInstruction.h"
 
 Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
     if (keyCode == KEY_ESC) {
@@ -14,6 +13,10 @@ Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
         InputMode mode = getNextMode();
 
         return new ModeChangeInstruction(mode);
+    }
+
+    if (keyCode == KEY_ENTER) {
+        return new CopyInstruction();
     }
 
     if (isModifier(keyCode)) {

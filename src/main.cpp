@@ -18,6 +18,7 @@
 #include "input/handler/instruction/ModeChangeInstruction.h"
 #include "input/handler/instruction/FilterInstruction.h"
 #include "config/ConfigManager.h"
+#include "input/handler/instruction/CopyInstruction.h"
 
 #include <glob.h> // glob(), globfree()
 #include <vector>
@@ -232,6 +233,12 @@ int main(int argc, char *argv[]) {
             if (config->isIsDebug()) {
                 drawText(windowManager.get(), "QUERY: " + filterInstruction->getFilterString(), Dimensions(500, 100));
             }
+        } else if(dynamic_cast<CopyInstruction *>(instruction.get())) {
+            // TODO: escape filename/path
+            // TODO: dynamic image type
+            std::string command = "cat " + itemPickerDrawer->getSelectedImage()->getPath() + " | xclip -selection clipboard -target image/png -i";
+            system(command.c_str());
+            keep_running = 0;
         }
 
         if (config->isIsDebug()) {
