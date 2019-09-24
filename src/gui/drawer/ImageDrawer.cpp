@@ -31,6 +31,12 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     imlib_context_set_drawable(windowManager->getWindow());
 
     XPoint *pos = getNextShapePosition(shapeProperties, windowDimensions);
+
+    if(shape.selected) {
+        XDrawRectangle(windowManager->getDisplay(), windowManager->getWindow(), selectedShapeGC, pos->x, pos->y,
+                       shapeProperties.dimensions.x, shapeProperties.dimensions.y);
+    }
+
     imlib_render_image_on_drawable(pos->x, pos->y);
 
     shape.position = *pos;
