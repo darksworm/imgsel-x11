@@ -5,11 +5,12 @@
 #include "dimensions.h"
 #include <memory>
 
-ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager,  std::vector<Image> *hotkeys) {
+ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager, std::vector<Image> *images) {
     this->windowManager = windowManager;
     this->page = 0;
     this->selectedShape = nullptr;
-    this->hotkeys = hotkeys;
+    this->allImages = images;
+    this->images = new std::vector<Image>(images->begin(), images->end());
 
     shapeDrawer = ShapeDrawerFactory::getShapeDrawer(ShapeType::IMAGE, windowManager);
     shapeProperties = shapeDrawer->calcShapeProps(windowManager->getWindow());
@@ -24,17 +25,17 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
     std::unique_ptr<Dimensions> windowDimensions(new Dimensions);
     windowManager->getWindowDimensions(&windowDimensions->x, &windowDimensions->y);
 
-    int shapeCnt = shapeProperties.itemCounts.x * shapeProperties.itemCounts.y;
+    unsigned int shapeCnt = shapeProperties.itemCounts.x * shapeProperties.itemCounts.y;
     int drawnShapeCnt = 0;
 
     auto it = start;
 
-    for (; it != hotkeys->end(); ++it) {
-        if(filter && !filter(&*it)){
+    for (; it != images->end(); ++it) {
+        if (filter && !filter(&*it)) {
             continue;
         }
 
-        if(selectedImage == nullptr){
+        if (selectedImage == nullptr) {
             selectedImage = &*it;
         }
 
@@ -42,16 +43,16 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
 
         Shape shape{
                 .selected = selected,
-                .index = std::distance(hotkeys->begin(), it),
+                .index = std::distance(images->begin(), it),
                 .image = &*it
         };
 
         shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
 
-        shapes.push_back(shape);
+        shapes.emplace(shape.index, shape);
 
         if (selected) {
-            this->selectedShape = &*(this->shapes.end() - 1);
+            this->selectedShape = &(--this->shapes.end())->second;
         }
 
         if (++drawnShapeCnt >= shapeCnt) {
@@ -61,13 +62,13 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
 
     bool hasNextPage = false;
 
-    if(!filter) {
-        hasNextPage = it + 1 < hotkeys->end();
+    if (!filter) {
+        hasNextPage = it + 1 < images->end();
     } else {
-        if(++it >= hotkeys->end()) {
+        if (++it >= images->end()) {
             hasNextPage = false;
         } else {
-            for (; it != hotkeys->end(); ++it) {
+            for (; it != images->end(); ++it) {
                 if (filter && !filter(&*it)) {
                     continue;
                 } else {
@@ -88,7 +89,8 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
 
     GC gc = XCreateGC(windowManager->getDisplay(), windowManager->getWindow(), 0, nullptr);
 
-    XSetForeground(windowManager->getDisplay(), gc, WhitePixel(windowManager->getDisplay(), DefaultScreen(windowManager->getDisplay())));
+    XSetForeground(windowManager->getDisplay(), gc,
+                   WhitePixel(windowManager->getDisplay(), DefaultScreen(windowManager->getDisplay())));
     XSetBackground(windowManager->getDisplay(), gc, DefaultScreen(windowManager->getDisplay()));
     XSetFillStyle(windowManager->getDisplay(), gc, FillSolid);
     XSetLineAttributes(windowManager->getDisplay(), gc, 2, LineSolid, CapRound, JoinRound);
@@ -99,10 +101,10 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
         auto spacing = 10;
         auto xPos = windowDimensions->x - 35;
         auto baseYPos = windowDimensions->y / 2 - (dia * 1.5) - spacing;
-        auto yPos =  baseYPos + (i * (dia + spacing));
+        auto yPos = baseYPos + (i * (dia + spacing));
 
         XDrawArc(windowManager->getDisplay(), windowManager->getWindow(), gc, xPos, yPos, dia, dia, 0, 360 * 64);
-        if(circleType == 1) {
+        if (circleType == 1) {
             XFillArc(windowManager->getDisplay(), windowManager->getWindow(), gc, xPos, yPos, dia, dia, 0, 360 * 64);
         }
         i++;
@@ -112,29 +114,44 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
 std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
     int hotkeysPerPage = shapeProperties.itemCounts.y * shapeProperties.itemCounts.x;
 
-    if (page > 0 && hotkeys->size() < hotkeysPerPage) {
+    preloadToIndex(hotkeysPerPage - 1);
+
+    if (page > 0 && images->size() < hotkeysPerPage) {
         throw OutOfBounds();
     }
 
     int offset = hotkeysPerPage * page;
 
-// TODO: what's the deal with this?
-//
-//    if(!this->filter) {
-        return hotkeys->begin() + offset;
-//    } else {
-//        int hotkeysFound = 0;
-//
-//        for (auto it = hotkeys->begin(); it != hotkeys->end(); ++it) {
-//            if(filter(&*it)) {
-//                if(++hotkeysFound > offset) {
-//                    return it;
-//                }
-//            }
-//        }
-//
-//        throw OutOfBounds();
-//    }
+    return images->begin() + offset;
+}
+
+void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
+    if(filter && images->size() < (long)targetIndex + 1) {
+        std::cout << "Loading page...\n";
+        unsigned int offset = 0;
+
+        if(lastPreloadedImageIndex) {
+            if(allImages->begin() + lastPreloadedImageIndex + 1 == allImages->end()) {
+                return;
+            } else {
+                offset = lastPreloadedImageIndex + 1;
+            }
+        }
+
+        unsigned int hotkeysPerPage = shapeProperties.itemCounts.y * shapeProperties.itemCounts.x;
+        unsigned int targetImageCount = ((targetIndex / hotkeysPerPage) + 1) * hotkeysPerPage;
+
+        for (auto it = allImages->begin() + offset; it != allImages->end(); ++it) {
+            if(filter(&*it)) {
+                images->push_back(*it);
+                lastPreloadedImageIndex = std::distance(allImages->begin(), it);
+
+                if(images->size() >= targetImageCount) {
+                    break;
+                }
+            }
+        }
+    }
 }
 
 int ImagePickerDrawer::getImagePage(long index) {
@@ -142,10 +159,10 @@ int ImagePickerDrawer::getImagePage(long index) {
 }
 
 void ImagePickerDrawer::goToImage(long hotkeyIdx) {
-    Image *hotkey = &*(hotkeys->begin() + hotkeyIdx);
+    Image *image = &*(images->begin() + hotkeyIdx);
 
     page = getImagePage(hotkeyIdx);
-    drawFrame(hotkey);
+    drawFrame(image);
 }
 
 bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
@@ -161,7 +178,8 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             debug = "LEFT";
             break;
         case ImagePickerMove::RIGHT:
-            canMove = selectedShape->index + steps < hotkeys->size();
+            preloadToIndex(selectedShape->index + steps);
+            canMove = selectedShape->index + steps < images->size();
             newSelectedShapeIdx = selectedShape->index + steps;
             debug = "RIGHT";
             break;
@@ -171,13 +189,15 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             debug = "UP";
             break;
         case ImagePickerMove::DOWN:
-            canMove = selectedShape->index + (steps * shapeProperties.itemCounts.x) < hotkeys->size();
+            preloadToIndex(selectedShape->index + (steps * shapeProperties.itemCounts.x));
+            canMove = selectedShape->index + (steps * shapeProperties.itemCounts.x) < images->size();
             newSelectedShapeIdx = selectedShape->index + (steps * shapeProperties.itemCounts.x);
             debug = "DOWN";
             break;
         case ImagePickerMove::END:
-            canMove = selectedShape->index != hotkeys->size() - 1;
-            newSelectedShapeIdx = hotkeys->size() - 1;
+            preloadToIndex(INT_MAX);
+            canMove = selectedShape->index != images->size() - 1;
+            newSelectedShapeIdx = images->size() - 1;
             debug = "END";
             break;
         case ImagePickerMove::HOME:
@@ -186,7 +206,8 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             debug = "HOME";
             break;
         case ImagePickerMove::LINE:
-            canMove = steps > 0 && shapeProperties.itemCounts.x * steps < hotkeys->size();
+            preloadToIndex(steps > 0 && shapeProperties.itemCounts.x * steps);
+            canMove = steps > 0 && shapeProperties.itemCounts.x * steps < images->size();
             newSelectedShapeIdx = shapeProperties.itemCounts.x * (steps - 1);
             debug = "LINE";
     }
@@ -202,7 +223,7 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
 }
 
 Image *ImagePickerDrawer::getSelectedImage() {
-    if(selectedShape != nullptr) {
+    if (selectedShape != nullptr) {
         return selectedShape->image;
     } else {
         return nullptr;
@@ -212,4 +233,12 @@ Image *ImagePickerDrawer::getSelectedImage() {
 void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter, std::string filterString) {
     this->filter = std::move(filter);
     this->filterString = filterString;
+
+    lastPreloadedImageIndex = 0;
+    images->clear();
+
+    if(filterString.empty()) {
+        delete(this->images);
+        this->images = new std::vector<Image>(allImages->begin(), allImages->end());
+    }
 }

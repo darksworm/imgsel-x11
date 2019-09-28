@@ -5,6 +5,7 @@
 #include <X11/extensions/xf86vmode.h>
 #include <functional>
 #include <memory>
+#include <map>
 
 #include "../image/image.h"
 #include "Shape.h"
@@ -35,8 +36,9 @@ private:
     Shape *selectedShape;
     int page = 0;
 
-    std::vector<Image> *hotkeys;
-    std::vector<Shape> shapes;
+    std::vector<Image> *images;
+    std::vector<Image> *allImages;
+    std::map<long,Shape> shapes;
 
     std::vector<Image>::iterator getPageImageStart();
 
@@ -48,8 +50,10 @@ private:
 
     std::string filterString = "";
 
+    unsigned int lastPreloadedImageIndex = 0;
+
 public:
-    ImagePickerDrawer(WindowManager* windowManager, std::vector<Image> *hotkeys);
+    ImagePickerDrawer(WindowManager* windowManager, std::vector<Image> *images);
 
     void drawFrame(Image* selectedImage);
 
@@ -62,6 +66,8 @@ public:
     std::string getFilterString() {
         return filterString;
     };
+
+    void preloadToIndex(unsigned int targetIndex);
 };
 
 
