@@ -26,7 +26,7 @@
 #include <string>
 #include <sstream>
 
-std::vector<std::string> glob(const std::string& pattern) {
+std::vector<std::string> glob(const std::string &pattern) {
     using namespace std;
 
     // glob struct resides on the stack
@@ -35,7 +35,7 @@ std::vector<std::string> glob(const std::string& pattern) {
 
     // do the glob operation
     int return_value = glob(pattern.c_str(), GLOB_TILDE, NULL, &glob_result);
-    if(return_value != 0) {
+    if (return_value != 0) {
         globfree(&glob_result);
         stringstream ss;
         ss << "glob() failed with return_value " << return_value << endl;
@@ -44,7 +44,7 @@ std::vector<std::string> glob(const std::string& pattern) {
 
     // collect all the filenames into a std::list<std::string>
     vector<string> filenames;
-    for(size_t i = 0; i < glob_result.gl_pathc; ++i) {
+    for (size_t i = 0; i < glob_result.gl_pathc; ++i) {
         filenames.push_back(string(glob_result.gl_pathv[i]));
     }
 
@@ -95,15 +95,15 @@ int main(int argc, char *argv[]) {
     auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
 
     std::vector<std::string> imageExtensions = {
-        "jpg",
-        "jpeg",
-        "png",
-        "gif"
+            "jpg",
+            "jpeg",
+            "png",
+            "gif"
     };
 
     std::vector<Image> images;
-    for(const auto& img:imageFiles) {
-        for(const auto& ext:imageExtensions) {
+    for (const auto &img:imageFiles) {
+        for (const auto &ext:imageExtensions) {
             if (0 == img.compare(img.length() - ext.length(), ext.length(), ext)) {
                 images.emplace_back(img);
                 break;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
     XKeyboardState initKBState;
     XGetKeyboardControl(display, &initKBState);
 
-    InputMode state = InputMode::SELECTION;
+    InputMode state = InputMode::TEXT_FILTER;
     int keep_running = 1;
     XEvent event;
 
@@ -160,8 +160,9 @@ int main(int argc, char *argv[]) {
                 case ConfigureNotify:
                     XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
                     auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
-                                                                    : &*images.begin();
+                                                                   : &*images.begin();
                     itemPickerDrawer->drawFrame(hk);
+                    drawText(windowManager.get(), "You're in TEXT_FILTER mode", Dimensions(100, 100));
                     break;
             }
         }
@@ -172,7 +173,6 @@ int main(int argc, char *argv[]) {
         *   and sleep for (16.6ms - passed time)
         */
         std::this_thread::sleep_for(std::chrono::nanoseconds(16600000));
-
 
         if (keyCode == 0) {
             continue;
@@ -218,10 +218,10 @@ int main(int argc, char *argv[]) {
                 itemPickerDrawer->drawFrame(itemPickerDrawer->getSelectedImage());
             }
         } else if (dynamic_cast<ModeChangeInstruction *>(instruction.get())) {
-            auto modeChangeInstruction = (ModeChangeInstruction*) instruction.get();
+            auto modeChangeInstruction = (ModeChangeInstruction *) instruction.get();
             state = modeChangeInstruction->newMode;
 
-            if(modeChangeInstruction->shouldClearFilters) {
+            if (modeChangeInstruction->shouldClearFilters) {
                 itemPickerDrawer->setFilter(nullptr);
             }
 
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
             if (config->isIsDebug()) {
                 drawText(windowManager.get(), "QUERY: " + filterInstruction->getFilterString(), Dimensions(500, 100));
             }
-        } else if(dynamic_cast<CopyInstruction *>(instruction.get())) {
+        } else if (dynamic_cast<CopyInstruction *>(instruction.get())) {
             auto selectedImage = itemPickerDrawer->getSelectedImage();
             auto path = selectedImage->getPath();
             auto ext = selectedImage->getExtension();
@@ -251,8 +251,16 @@ int main(int argc, char *argv[]) {
         }
 
         if (config->isIsDebug()) {
-            static const char *inputModes[] = {"SELECTION", "TEXT_FILTER"};
-            drawText(windowManager.get(), inputModes[(int) state], Dimensions(100, 100));
+            static const std::string inputModes[] = {"SELECTION", "TEXT_FILTER"};
+            drawText(windowManager.get(), "You're in " + inputModes[(int) state] + " mode", Dimensions(100, 100));
+
+//            if(inputModes[(int) state] == "SELECTION") {
+//                drawText(windowManager.get(), "To move around, use the HJKL or arrow keys", Dimensions(400, 900));
+//                drawText(windowManager.get(), "To filter by text, use the '/' key", Dimensions(400, 910));
+//            } else {
+//                drawText(windowManager.get(), "To go back to the selection mode, press the CAPS LOCK key", Dimensions(400, 920));
+//                drawText(windowManager.get(), "To filter by text, use the '/' key", Dimensions(400, 910));
+//            }
         }
     }
 

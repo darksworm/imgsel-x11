@@ -23,6 +23,10 @@ Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
         addModifier(keyCode);
     }
 
+    if (keyCode == KEY_C && isModifierActive("CONTROL")) {
+        return new Instruction(InstructionType::EXIT);
+    }
+
     return new Instruction(InstructionType::NONE);
 }
 
@@ -42,6 +46,8 @@ bool InputHandler::isModifier(unsigned keyCode) {
     switch (keyCode) {
         case KEY_RIGHTSHIFT:
         case KEY_LEFTSHIFT:
+            return true;
+        case KEY_LEFTCTRL:
             return true;
     }
 
