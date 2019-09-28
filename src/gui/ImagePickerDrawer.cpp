@@ -27,7 +27,9 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
     int shapeCnt = shapeProperties.itemCounts.x * shapeProperties.itemCounts.y;
     int drawnShapeCnt = 0;
 
-    for (auto it = start; it != hotkeys->end(); ++it) {
+    auto it = start;
+
+    for (; it != hotkeys->end(); ++it) {
         if(filter && !filter(&*it)){
             continue;
         }
@@ -55,6 +57,55 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
         if (++drawnShapeCnt >= shapeCnt) {
             break;
         }
+    }
+
+    bool hasNextPage = false;
+
+    if(!filter) {
+        hasNextPage = it + 1 < hotkeys->end();
+    } else {
+        if(++it >= hotkeys->end()) {
+            hasNextPage = false;
+        } else {
+            for (; it != hotkeys->end(); ++it) {
+                if (filter && !filter(&*it)) {
+                    continue;
+                } else {
+                    hasNextPage = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    int circleTypes[] = {0, 0, 0};
+
+    if (hasNextPage) {
+        circleTypes[page == 0 ? 0 : 1] = 1;
+    } else {
+        circleTypes[2] = 1;
+    }
+
+    GC gc = XCreateGC(windowManager->getDisplay(), windowManager->getWindow(), 0, nullptr);
+
+    XSetForeground(windowManager->getDisplay(), gc, WhitePixel(windowManager->getDisplay(), DefaultScreen(windowManager->getDisplay())));
+    XSetBackground(windowManager->getDisplay(), gc, DefaultScreen(windowManager->getDisplay()));
+    XSetFillStyle(windowManager->getDisplay(), gc, FillSolid);
+    XSetLineAttributes(windowManager->getDisplay(), gc, 2, LineSolid, CapRound, JoinRound);
+
+    int i = 0;
+    for (const int &circleType : circleTypes) {
+        auto dia = 15;
+        auto spacing = 10;
+        auto xPos = windowDimensions->x - 35;
+        auto baseYPos = windowDimensions->y / 2 - (dia * 1.5) - spacing;
+        auto yPos =  baseYPos + (i * (dia + spacing));
+
+        XDrawArc(windowManager->getDisplay(), windowManager->getWindow(), gc, xPos, yPos, dia, dia, 0, 360 * 64);
+        if(circleType == 1) {
+            XFillArc(windowManager->getDisplay(), windowManager->getWindow(), gc, xPos, yPos, dia, dia, 0, 360 * 64);
+        }
+        i++;
     }
 }
 
@@ -158,6 +209,11 @@ Image *ImagePickerDrawer::getSelectedImage() {
     }
 }
 
-void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter) {
+std::string ImagePickerDrawer::getFilterString() {
+    return filterString;
+}
+
+void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter, std::string filterString) {
     this->filter = std::move(filter);
+    this->filterString = filterString;
 }
