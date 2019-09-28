@@ -1,6 +1,6 @@
-#include <linux/input-event-codes.h>
 #include "FilteringInputHandler.h"
 #include "../instruction/FilterInstruction.h"
+#include "../instruction/ModeChangeInstruction.h"
 
 Instruction *FilteringInputHandler::handleKeyPress(unsigned keyPress) {
     auto instruction = InputHandler::handleKeyPress(keyPress);
@@ -13,6 +13,8 @@ Instruction *FilteringInputHandler::handleKeyPress(unsigned keyPress) {
                 delete instruction;
                 instruction = new FilterInstruction(this->getFilter(), this->getFilterText());
             }
+
+            break;
         }
 
         case InstructionType::NONE: {

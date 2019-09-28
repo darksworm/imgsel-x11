@@ -218,9 +218,13 @@ int main(int argc, char *argv[]) {
                 itemPickerDrawer->drawFrame(itemPickerDrawer->getSelectedImage());
             }
         } else if (dynamic_cast<ModeChangeInstruction *>(instruction.get())) {
-            state = ((ModeChangeInstruction *) (instruction.get()))->getNewMode();
+            auto modeChangeInstruction = (ModeChangeInstruction*) instruction.get();
+            state = modeChangeInstruction->newMode;
 
-            itemPickerDrawer->setFilter(nullptr);
+            if(modeChangeInstruction->shouldClearFilters) {
+                itemPickerDrawer->setFilter(nullptr);
+            }
+
             XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<FilterInstruction *>(instruction.get())) {

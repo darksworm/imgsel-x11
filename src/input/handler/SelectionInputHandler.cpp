@@ -37,6 +37,9 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
         if (move != ImagePickerMove::NONE) {
             delete instruction;
             instruction = new MoveInstruction(move, repeatNextCommandTimes);
+        } else if (keyCode == KEY_C) {
+            // change to the same mode, but clear filters.
+            instruction = new ModeChangeInstruction(InputMode::SELECTION, 0, false, true);
         }
     }
 
