@@ -32,12 +32,16 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 
     XPoint *pos = getNextShapePosition(shapeProperties, windowDimensions);
 
-    if(shape.selected) {
+    if (shape.selected) {
         XDrawRectangle(windowManager->getDisplay(), windowManager->getWindow(), selectedShapeGC, pos->x, pos->y,
                        shapeProperties.dimensions.x, shapeProperties.dimensions.y);
     }
 
-    imlib_render_image_on_drawable(pos->x, pos->y);
+    XPoint imagePos = XPoint();
+    imagePos.x = pos->x + shapeProperties.dimensions.x / 2 - width / 2;
+    imagePos.y = pos->y + shapeProperties.dimensions.y / 2 - height / 2;
+
+    imlib_render_image_on_drawable(imagePos.x, imagePos.y);
 
     shape.position = *pos;
     lastShapePosition = pos;
@@ -45,15 +49,25 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     imlib_free_image();
     XFreePixmap(windowManager->getDisplay(), pix);
 
+    XDrawString(
+            windowManager->getDisplay(),
+            windowManager->getWindow(),
+            textGC,
+            shape.position.x + shapeProperties.botTextRect.x,
+            shape.position.y + shapeProperties.botTextRect.y,
+            shape.image->getFilename().c_str(),
+            (int) shape.image->getFilename().length()
+    );
+
     return shape;
 }
 
 ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     // TODO: calculate dynamically
     ShapeProperties shapeProperties{
-            .dimensions = Dimensions(300,150),
-            .margins = Dimensions(20,20),
-            .itemCounts = Dimensions(4,4),
+            .dimensions = Dimensions(300, 150),
+            .margins = Dimensions(20, 20),
+            .itemCounts = Dimensions(4, 4),
             .topTextRect = XRectangle{
                     .x = 10,
                     .y = 20,
