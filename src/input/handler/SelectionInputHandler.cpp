@@ -9,6 +9,11 @@
 Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
     auto instruction = InputHandler::handleKeyPress(keyCode);
 
+    if (keyCode == KEY_Q) {
+        instruction = new Instruction(InstructionType::EXIT);
+        return instruction;
+    }
+
     if (instruction->getType() == InstructionType::NONE) {
         ImagePickerMove move = ImagePickerMove::NONE;
 
