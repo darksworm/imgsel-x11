@@ -162,7 +162,8 @@ int main(int argc, char *argv[]) {
                     auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                                    : &*images.begin();
                     itemPickerDrawer->drawFrame(hk);
-                    drawText(windowManager.get(), "You're in TEXT_FILTER mode", Dimensions(100, 100));
+                    drawText(windowManager.get(), "You're in TEXT_FILTER mode", Dimensions(900, 150));
+                    drawText(windowManager.get(), "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
                     break;
             }
         }
@@ -202,7 +203,11 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        if (dynamic_cast<MoveInstruction *>(instruction.get())) {
+        if (instruction->getType() == InstructionType::CANCEL) {
+            itemPickerDrawer->setFilter(nullptr, "");
+            XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
+            itemPickerDrawer->drawFrame(nullptr);
+        } else if (dynamic_cast<MoveInstruction *>(instruction.get())) {
             auto moveInstruction = ((MoveInstruction *) instruction.get());
             auto move = moveInstruction->getMoveDirection();
 
@@ -222,7 +227,7 @@ int main(int argc, char *argv[]) {
             state = modeChangeInstruction->newMode;
 
             if (modeChangeInstruction->shouldClearFilters) {
-                itemPickerDrawer->setFilter(nullptr);
+                itemPickerDrawer->setFilter(nullptr, "");
             }
 
             XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
@@ -230,13 +235,9 @@ int main(int argc, char *argv[]) {
         } else if (dynamic_cast<FilterInstruction *>(instruction.get())) {
             auto filterInstruction = ((FilterInstruction *) instruction.get());
 
-            itemPickerDrawer->setFilter(filterInstruction->getFilter());
+            itemPickerDrawer->setFilter(filterInstruction->getFilter(), filterInstruction->getFilterString());
             XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
             itemPickerDrawer->drawFrame(nullptr);
-
-            if (config->isIsDebug()) {
-                drawText(windowManager.get(), "QUERY: " + filterInstruction->getFilterString(), Dimensions(500, 100));
-            }
         } else if (dynamic_cast<CopyInstruction *>(instruction.get())) {
             auto selectedImage = itemPickerDrawer->getSelectedImage();
             auto path = selectedImage->getPath();
@@ -252,15 +253,12 @@ int main(int argc, char *argv[]) {
 
         if (config->isIsDebug()) {
             static const std::string inputModes[] = {"SELECTION", "TEXT_FILTER"};
-            drawText(windowManager.get(), "You're in " + inputModes[(int) state] + " mode", Dimensions(100, 100));
+            drawText(windowManager.get(), "You're in " + inputModes[(int) state] + " mode", Dimensions(900, 150));
+            drawText(windowManager.get(), "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
 
-//            if(inputModes[(int) state] == "SELECTION") {
-//                drawText(windowManager.get(), "To move around, use the HJKL or arrow keys", Dimensions(400, 900));
-//                drawText(windowManager.get(), "To filter by text, use the '/' key", Dimensions(400, 910));
-//            } else {
-//                drawText(windowManager.get(), "To go back to the selection mode, press the CAPS LOCK key", Dimensions(400, 920));
-//                drawText(windowManager.get(), "To filter by text, use the '/' key", Dimensions(400, 910));
-//            }
+            if (!itemPickerDrawer->getFilterString().empty()) {
+                drawText(windowManager.get(), "QUERY: " + itemPickerDrawer->getFilterString(), Dimensions(500, 100));
+            }
         }
     }
 

@@ -6,7 +6,7 @@
 
 Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
     if (keyCode == KEY_ESC) {
-        return new Instruction(InstructionType::EXIT);
+        return new Instruction(InstructionType::CANCEL);
     }
 
     if (keyCode == KEY_CAPSLOCK) {

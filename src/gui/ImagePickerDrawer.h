@@ -46,6 +46,8 @@ private:
 
     std::function<bool(Image*)> filter;
 
+    std::string filterString = "";
+
 public:
     ImagePickerDrawer(WindowManager* windowManager, std::vector<Image> *hotkeys);
 
@@ -53,9 +55,13 @@ public:
 
     bool move(ImagePickerMove move, unsigned int steps = 1);
 
-    void setFilter(std::function<bool(Image *)> filter);
+    void setFilter(std::function<bool(Image *)> filter, std::string filterString);
 
     Image* getSelectedImage();
+
+    std::string getFilterString() {
+        return filterString;
+    };
 };
 
 

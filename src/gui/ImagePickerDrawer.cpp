@@ -209,10 +209,6 @@ Image *ImagePickerDrawer::getSelectedImage() {
     }
 }
 
-std::string ImagePickerDrawer::getFilterString() {
-    return filterString;
-}
-
 void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter, std::string filterString) {
     this->filter = std::move(filter);
     this->filterString = filterString;

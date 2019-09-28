@@ -6,5 +6,6 @@ enum class InstructionType {
     CHANGE_MODE,
     MOVE,
     FILTER,
-    COPY
+    COPY,
+    CANCEL
 };

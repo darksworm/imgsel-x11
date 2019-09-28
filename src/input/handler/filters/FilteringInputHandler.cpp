@@ -6,7 +6,7 @@ Instruction *FilteringInputHandler::handleKeyPress(unsigned keyPress) {
     auto instruction = InputHandler::handleKeyPress(keyPress);
 
     switch (instruction->getType()) {
-        case InstructionType::EXIT: {
+        case InstructionType::CANCEL: {
             if (!this->buffer.empty()) {
                 this->buffer.clear();
 
