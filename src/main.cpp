@@ -234,9 +234,14 @@ int main(int argc, char *argv[]) {
                 drawText(windowManager.get(), "QUERY: " + filterInstruction->getFilterString(), Dimensions(500, 100));
             }
         } else if(dynamic_cast<CopyInstruction *>(instruction.get())) {
-            // TODO: escape filename/path
-            // TODO: dynamic image type
-            std::string command = "cat " + itemPickerDrawer->getSelectedImage()->getPath() + " | xclip -selection clipboard -target image/png -i";
+            auto selectedImage = itemPickerDrawer->getSelectedImage();
+            auto path = selectedImage->getPath();
+            auto ext = selectedImage->getExtension();
+
+            ext = ext == "jpg" ? "jpeg" : ext;
+
+            // TODO: handle 's in filenames
+            std::string command = "cat '" + path + "' | xclip -selection clipboard -target image/" + ext + " -i";
             system(command.c_str());
             keep_running = 0;
         }
