@@ -59,56 +59,6 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
             break;
         }
     }
-
-    bool hasNextPage = false;
-
-    if (!filter) {
-        hasNextPage = it + 1 < images->end();
-    } else {
-        if (++it >= images->end()) {
-            hasNextPage = false;
-        } else {
-            for (; it != images->end(); ++it) {
-                if (filter && !filter(&*it)) {
-                    continue;
-                } else {
-                    hasNextPage = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    int circleTypes[] = {0, 0, 0};
-
-    if (hasNextPage) {
-        circleTypes[page == 0 ? 0 : 1] = 1;
-    } else {
-        circleTypes[2] = 1;
-    }
-
-    GC gc = XCreateGC(windowManager->getDisplay(), windowManager->getWindow(), 0, nullptr);
-
-    XSetForeground(windowManager->getDisplay(), gc,
-                   WhitePixel(windowManager->getDisplay(), DefaultScreen(windowManager->getDisplay())));
-    XSetBackground(windowManager->getDisplay(), gc, DefaultScreen(windowManager->getDisplay()));
-    XSetFillStyle(windowManager->getDisplay(), gc, FillSolid);
-    XSetLineAttributes(windowManager->getDisplay(), gc, 2, LineSolid, CapRound, JoinRound);
-
-    int i = 0;
-    for (const int &circleType : circleTypes) {
-        auto dia = 15;
-        auto spacing = 10;
-        auto xPos = windowDimensions->x - 35;
-        auto baseYPos = windowDimensions->y / 2 - (dia * 1.5) - spacing;
-        auto yPos = baseYPos + (i * (dia + spacing));
-
-        XDrawArc(windowManager->getDisplay(), windowManager->getWindow(), gc, xPos, yPos, dia, dia, 0, 360 * 64);
-        if (circleType == 1) {
-            XFillArc(windowManager->getDisplay(), windowManager->getWindow(), gc, xPos, yPos, dia, dia, 0, 360 * 64);
-        }
-        i++;
-    }
 }
 
 std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
