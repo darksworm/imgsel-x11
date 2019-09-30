@@ -39,7 +39,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
             selectedImage = &*it;
         }
 
-        bool selected =  &*it == selectedImage;
+        bool selected =  it->getPath() == selectedImage->getPath();
 
         Shape shape{
                 .selected = selected,
@@ -157,9 +157,24 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             break;
         case ImagePickerMove::LINE:
             preloadToIndex(steps > 0 && shapeProperties.itemCounts.x * steps);
+            // TODO: this seems wrong
             canMove = steps > 0 && shapeProperties.itemCounts.x * steps < images->size();
             newSelectedShapeIdx = shapeProperties.itemCounts.x * (steps - 1);
             debug = "LINE";
+            break;
+        case ImagePickerMove::PG_DOWN:
+            preloadToIndex(steps > 0 && shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
+            newSelectedShapeIdx = selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
+            newSelectedShapeIdx = newSelectedShapeIdx > images->size() - 1 ? images->size() - 1 : newSelectedShapeIdx;
+            canMove = newSelectedShapeIdx != selectedShape->index;
+            debug = "PGDOWN";
+            break;
+        case ImagePickerMove::PG_UP:
+            newSelectedShapeIdx = selectedShape->index - (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
+            newSelectedShapeIdx = newSelectedShapeIdx > 0 ? newSelectedShapeIdx : 0;
+            canMove = selectedShape->index != newSelectedShapeIdx;
+            debug = "PGUP";
+            break;
     }
 
     printf("type: %s, canmove: %d oldIdx: %d newIdx: %d \n", debug, canMove, selectedShape->index,

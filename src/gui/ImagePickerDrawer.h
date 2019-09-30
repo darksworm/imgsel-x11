@@ -23,7 +23,10 @@ enum class ImagePickerMove {
     HOME,
     END,
 
-    LINE
+    LINE,
+
+    PG_DOWN,
+    PG_UP
 };
 
 class ImagePickerDrawer {

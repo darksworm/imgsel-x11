@@ -44,6 +44,18 @@ Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
         case KEY_UP:
             move = ImagePickerMove::UP;
             break;
+        case KEY_PAGEDOWN:
+            move = ImagePickerMove::PG_DOWN;
+            break;
+        case KEY_PAGEUP:
+            move = ImagePickerMove::PG_UP;
+            break;
+        case KEY_HOME:
+            move = ImagePickerMove::HOME;
+            break;
+        case KEY_END:
+            move = ImagePickerMove::END;
+            break;
         default:
             move = ImagePickerMove::NONE;
             break;
