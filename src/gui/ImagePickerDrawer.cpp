@@ -198,6 +198,7 @@ Image *ImagePickerDrawer::getSelectedImage() {
 void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter, std::string filterString) {
     this->filter = std::move(filter);
     this->filterString = filterString;
+    this->page = 0;
 
     lastPreloadedImageIndex = 0;
     images->clear();
