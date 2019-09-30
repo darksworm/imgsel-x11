@@ -163,7 +163,7 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             debug = "LINE";
             break;
         case ImagePickerMove::PG_DOWN:
-            preloadToIndex(steps > 0 && shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
+            preloadToIndex(selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps));
             newSelectedShapeIdx = selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
             newSelectedShapeIdx = newSelectedShapeIdx > images->size() - 1 ? images->size() - 1 : newSelectedShapeIdx;
             canMove = newSelectedShapeIdx != selectedShape->index;
