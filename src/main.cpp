@@ -198,7 +198,9 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        if (instruction->getType() == InstructionType::EXIT) {
+        bool shouldExit = itemPickerDrawer->getFilterString().empty() && instruction->getType() == InstructionType::CANCEL;
+
+        if (shouldExit || instruction->getType() == InstructionType::EXIT) {
             keep_running = 0;
             continue;
         }
