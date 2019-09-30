@@ -3,6 +3,8 @@
 #include "instruction/ModeChangeInstruction.h"
 #include "../../lib/keycode/keycode.h"
 #include "instruction/CopyInstruction.h"
+#include "../../gui/ImagePickerDrawer.h"
+#include "instruction/MoveInstruction.h"
 
 Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
     if (keyCode == KEY_ESC) {
@@ -25,6 +27,30 @@ Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
 
     if (keyCode == KEY_C && isModifierActive("CONTROL")) {
         return new Instruction(InstructionType::EXIT);
+    }
+
+    ImagePickerMove move = ImagePickerMove::NONE;
+
+    switch (keyCode) {
+        case KEY_LEFT:
+            move = ImagePickerMove::LEFT;
+            break;
+        case KEY_RIGHT:
+            move = ImagePickerMove::RIGHT;
+            break;
+        case KEY_DOWN:
+            move = ImagePickerMove::DOWN;
+            break;
+        case KEY_UP:
+            move = ImagePickerMove::UP;
+            break;
+        default:
+            move = ImagePickerMove::NONE;
+            break;
+    }
+
+    if (move != ImagePickerMove::NONE) {
+        return new MoveInstruction(move, 1);
     }
 
     return new Instruction(InstructionType::NONE);

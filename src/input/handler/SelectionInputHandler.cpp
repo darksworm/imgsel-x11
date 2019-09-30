@@ -23,19 +23,15 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
                 instruction = new ModeChangeInstruction(InputMode::TEXT_FILTER);
                 break;
             case KEY_H:
-            case KEY_LEFT:
                 move = ImagePickerMove::LEFT;
                 break;
             case KEY_L:
-            case KEY_RIGHT:
                 move = ImagePickerMove::RIGHT;
                 break;
             case KEY_J:
-            case KEY_DOWN:
                 move = ImagePickerMove::DOWN;
                 break;
             case KEY_K:
-            case KEY_UP:
                 move = ImagePickerMove::UP;
                 break;
             default:
