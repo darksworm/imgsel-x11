@@ -25,6 +25,8 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <sys/file.h>
+#include <cerrno>
 
 std::vector<std::string> glob(const std::string &pattern) {
     using namespace std;
@@ -91,6 +93,14 @@ void drawText(WindowManager *windowManager, const std::string &text, Dimensions 
 }
 
 int main(int argc, char *argv[]) {
+    // TODO: is /tmp a good directory for a pid file?
+    int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
+    int rc = flock(pid_file, LOCK_EX | LOCK_NB);
+    if (rc && EWOULDBLOCK == errno) {
+        std::cout << "another proccess is already running!";
+        exit(1);
+    }
+
     std::vector<std::string> imageFiles = glob(argv[1]);
     auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
 
