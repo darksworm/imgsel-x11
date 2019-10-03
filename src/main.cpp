@@ -281,6 +281,8 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
 }
 
 int main(int argc, char *argv[]) {
+    XInitThreads();
+
     // TODO: is /tmp a good directory for a pid file?
     int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
     int rc = flock(pid_file, LOCK_EX | LOCK_NB);
@@ -319,8 +321,6 @@ int main(int argc, char *argv[]) {
 
     ThreadSafeQueue<XEventWrapper> eventQueue;
     bool shouldQuit;
-
-    XInitThreads();
 
     std::thread xEventListener(handleXInput, windowManager, &eventQueue, &shouldQuit);
     std::thread xEventHandler(handleEvents, windowManager, &eventQueue, images, &shouldQuit);
