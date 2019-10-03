@@ -281,7 +281,10 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
 }
 
 int main(int argc, char *argv[]) {
-    XInitThreads();
+    if (!XInitThreads()) {
+        std::cout << "Failed to initialize XLib threads!";
+        exit(1);
+    }
 
     // TODO: is /tmp a good directory for a pid file?
     int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
