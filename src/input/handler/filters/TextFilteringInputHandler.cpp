@@ -27,13 +27,13 @@ std::function<bool(Image *)> TextFilteringInputHandler::getFilter() {
     /** mom, look at me im using lambdas
      AKA refactor me please */
     return std::function<bool(Image *hotkey)>(
-            [bufferString, upperCase](Image *hotkey) {
+            [bufferString, upperCase](Image *image) {
                 auto str = upperCase(bufferString);
-                auto fileName = hotkey->getPath();
-                auto lastSlashPos = fileName.find_last_of('/');
+                auto fileName = image->getFilename();
+                auto lastSlashPos = fileName.find_last_of('.');
 
                 if(lastSlashPos != std::string::npos) {
-                    fileName = fileName.substr(lastSlashPos + 1);
+                    fileName = fileName.substr(0, lastSlashPos);
                 }
 
                 return upperCase(fileName).find(str) != std::string::npos;
