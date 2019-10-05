@@ -150,13 +150,13 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             new ImagePickerDrawer(windowManager, &images)
     );
 
-    itemPickerDrawer->drawFrame(&*images.begin());
-
     std::unique_ptr<InputHandler> inputHandler(nullptr);
 
     bool keep_running = true, readEvent;
     XEventWrapper event;
     InputMode state = InputMode::TEXT_FILTER;
+
+    bool initialFrameDrawn = false;
 
     while (keep_running) {
         unsigned keyCode = 0;
@@ -180,11 +180,17 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         }
 
         if (event.eventType == ConfigureNotify) {
+            if(initialFrameDrawn) {
+                continue;
+            }
+
             auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                            : &*images.begin();
             itemPickerDrawer->drawFrame(hk);
             drawText(windowManager, "You're in TEXT_FILTER mode", Dimensions(900, 150));
             drawText(windowManager, "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
+
+            initialFrameDrawn = true;
             continue;
         }
 
