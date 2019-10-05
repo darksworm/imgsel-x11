@@ -11,7 +11,12 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     Pixmap pix;
     int width, height;
 
-    img = imlib_load_image(shape.image->getPath().c_str());
+    if (shape.image->getImg() == nullptr) {
+        shape.image->setImg(imlib_load_image(shape.image->getPath().c_str()));
+    }
+
+    img = shape.image->getImg();
+
     if (!img) {
         fprintf(stderr, "%s:Unable to load image\n", shape.image->getPath().c_str());
         throw 0;
@@ -24,7 +29,6 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     pix = XCreatePixmap(windowManager->getDisplay(), windowManager->getWindow(), width, height,
                         windowManager->getDepth());
 
-
     imlib_context_set_display(windowManager->getDisplay());
     imlib_context_set_visual(windowManager->getVisual());
     imlib_context_set_colormap(windowManager->getColorMap());
@@ -32,18 +36,14 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 
     XPoint *pos = getNextShapePosition(shapeProperties, windowDimensions);
 
-    if (shape.selected) {
-        XDrawRectangle(windowManager->getDisplay(), windowManager->getWindow(), selectedShapeGC, pos->x, pos->y,
-                       shapeProperties.dimensions.x, shapeProperties.dimensions.y);
-    }
-
     XPoint imagePos = XPoint();
     imagePos.x = pos->x + shapeProperties.dimensions.x / 2 - width / 2;
     imagePos.y = pos->y + shapeProperties.dimensions.y / 2 - height / 2;
 
     imlib_render_image_on_drawable(imagePos.x, imagePos.y);
 
-    shape.position = *pos;
+    shape.position.x = pos->x;
+    shape.position.y = pos->y;
     lastShapePosition = pos;
 
     imlib_free_image();
@@ -131,4 +131,56 @@ XPoint *ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimen
     }
 
     return newShapePosition;
+}
+
+void ImageDrawer::drawSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) {
+    if (shape.selected) {
+        auto pos = shape.position;
+        XDrawRectangle(windowManager->getDisplay(), windowManager->getWindow(), selectedShapeGC, pos.x, pos.y,
+                       shapeProperties.dimensions.x, shapeProperties.dimensions.y);
+    }
+}
+
+void ImageDrawer::clearSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) {
+    auto pos = shape.position;
+
+    XClearArea(
+            windowManager->getDisplay(),
+            windowManager->getWindow(),
+            pos.x - selectedShapeLineWidth,
+            pos.y - selectedShapeLineWidth,
+            shapeProperties.dimensions.x + (2 * selectedShapeLineWidth),
+            selectedShapeLineWidth * 2,
+            false
+    );
+
+    XClearArea(
+            windowManager->getDisplay(),
+            windowManager->getWindow(),
+            pos.x - selectedShapeLineWidth,
+            pos.y - selectedShapeLineWidth + shapeProperties.dimensions.y,
+            shapeProperties.dimensions.x + (2 * selectedShapeLineWidth),
+            selectedShapeLineWidth * 2,
+            false
+    );
+
+    XClearArea(
+            windowManager->getDisplay(),
+            windowManager->getWindow(),
+            pos.x - selectedShapeLineWidth,
+            pos.y - selectedShapeLineWidth,
+            (2 * selectedShapeLineWidth),
+            shapeProperties.dimensions.y + selectedShapeLineWidth * 2,
+            false
+    );
+
+    XClearArea(
+            windowManager->getDisplay(),
+            windowManager->getWindow(),
+            pos.x - selectedShapeLineWidth + shapeProperties.dimensions.x,
+            pos.y - selectedShapeLineWidth,
+            (2 * selectedShapeLineWidth),
+            shapeProperties.dimensions.y + selectedShapeLineWidth * 2,
+            false
+    );
 }

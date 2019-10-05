@@ -13,6 +13,10 @@ protected:
 
     XPoint *getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) override;
 
+    void drawSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) override;
+
+    void clearSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) override;
+
 public:
     ImageDrawer(WindowManager *windowManager) : ShapeDrawer(windowManager) {};
 };

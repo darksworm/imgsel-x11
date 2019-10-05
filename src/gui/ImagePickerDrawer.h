@@ -55,6 +55,8 @@ private:
 
     unsigned int lastPreloadedImageIndex = 0;
 
+    bool redrawAllInNextFrame = false;
+
 public:
     ImagePickerDrawer(WindowManager* windowManager, std::vector<Image> *images);
 

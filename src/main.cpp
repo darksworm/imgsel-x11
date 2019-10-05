@@ -180,7 +180,6 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         }
 
         if (event.eventType == ConfigureNotify) {
-            XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
             auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                            : &*images.begin();
             itemPickerDrawer->drawFrame(hk);
@@ -222,15 +221,12 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
 
         if (instruction->getType() == InstructionType::CANCEL) {
             itemPickerDrawer->setFilter(nullptr, "");
-            XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<MoveInstruction *>(instruction.get())) {
             auto moveInstruction = ((MoveInstruction *) instruction.get());
             auto move = moveInstruction->getMoveDirection();
 
             bool moved = false;
-
-            XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
 
             if (move != ImagePickerMove::NONE) {
                 moved = itemPickerDrawer->move(moveInstruction->getMoveDirection(), moveInstruction->getMoveSteps());
@@ -247,13 +243,11 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
                 itemPickerDrawer->setFilter(nullptr, "");
             }
 
-            XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<FilterInstruction *>(instruction.get())) {
             auto filterInstruction = ((FilterInstruction *) instruction.get());
 
             itemPickerDrawer->setFilter(filterInstruction->getFilter(), filterInstruction->getFilterString());
-            XClearWindow(windowManager->getDisplay(), windowManager->getWindow());
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<CopyInstruction *>(instruction.get())) {
             auto selectedImage = itemPickerDrawer->getSelectedImage();

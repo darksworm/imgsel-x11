@@ -19,6 +19,9 @@ ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager, std::vector<I
 void ImagePickerDrawer::drawFrame(Image *selectedImage) {
     auto start = getPageImageStart();
 
+    auto oldShapes = std::map<long, Shape>();
+    oldShapes.insert(shapes.begin(), shapes.end());
+
     shapes.clear();
     shapeDrawer->lastShapePosition = nullptr;
 
@@ -39,26 +42,69 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
             selectedImage = &*it;
         }
 
-        bool selected =  it->getPath() == selectedImage->getPath();
+        bool selected = it->getPath() == selectedImage->getPath();
 
         Shape shape{
-                .selected = selected,
                 .index = std::distance(images->begin(), it),
                 .image = &*it
         };
 
-        shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
+        bool shouldDrawShape = true;
 
-        shapes.emplace(shape.index, shape);
+        try {
+            auto oldShape = oldShapes.at(drawnShapeCnt);
+
+            if (!redrawAllInNextFrame && oldShape.image->getPath() == shape.image->getPath()) {
+                shouldDrawShape = false;
+                shape = oldShape;
+                shapeDrawer->lastShapePosition = &oldShape.position;
+
+                if (oldShape.selected && !selected) {
+                    shapeDrawer->clearSelectedShapeIndicator(shapeProperties, oldShape);
+                }
+            } else {
+                if (!this->shapes.empty()) {
+                    shapeDrawer->lastShapePosition = &(--this->shapes.end())->second.position;
+                }
+                // TODO: these parameters are wack
+                XClearArea(windowManager->getDisplay(), windowManager->getWindow(), oldShape.position.x - 2,
+                           oldShape.position.y - 2, shapeProperties.dimensions.x + 4, shapeProperties.dimensions.y + 4,
+                           false);
+            }
+        } catch (std::out_of_range &e) {
+            // nothing to do here
+        }
+
+        shape.selected = selected;
+
+        if (shouldDrawShape) {
+            shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
+        }
+
+        shapes.emplace(drawnShapeCnt, shape);
 
         if (selected) {
             this->selectedShape = &(--this->shapes.end())->second;
+            shapeDrawer->drawSelectedShapeIndicator(shapeProperties, shape);
         }
 
         if (++drawnShapeCnt >= shapeCnt) {
             break;
         }
     }
+
+    // Clear all old trailing images
+    if (drawnShapeCnt < shapeCnt && oldShapes.size() > drawnShapeCnt) {
+        unsigned i = drawnShapeCnt;
+        do {
+            auto oldShape = oldShapes.at(i);
+            XClearArea(windowManager->getDisplay(), windowManager->getWindow(), oldShape.position.x - 2,
+                       oldShape.position.y - 2, shapeProperties.dimensions.x + 4, shapeProperties.dimensions.y + 4,
+                       false);
+        } while (++i < oldShapes.size());
+    }
+
+    redrawAllInNextFrame = false;
 }
 
 std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
@@ -76,12 +122,12 @@ std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
 }
 
 void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
-    if(filter && images->size() < (long)targetIndex + 1) {
+    if (filter && images->size() < (long) targetIndex + 1) {
         std::cout << "Loading page...\n";
         unsigned int offset = 0;
 
-        if(lastPreloadedImageIndex) {
-            if(allImages->begin() + lastPreloadedImageIndex + 1 == allImages->end()) {
+        if (lastPreloadedImageIndex) {
+            if (allImages->begin() + lastPreloadedImageIndex + 1 == allImages->end()) {
                 return;
             } else {
                 offset = lastPreloadedImageIndex + 1;
@@ -92,11 +138,11 @@ void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
         unsigned int targetImageCount = ((targetIndex / hotkeysPerPage) + 1) * hotkeysPerPage;
 
         for (auto it = allImages->begin() + offset; it != allImages->end(); ++it) {
-            if(filter(&*it)) {
+            if (filter(&*it)) {
                 images->push_back(*it);
                 lastPreloadedImageIndex = std::distance(allImages->begin(), it);
 
-                if(images->size() >= targetImageCount) {
+                if (images->size() >= targetImageCount) {
                     break;
                 }
             }
@@ -163,14 +209,17 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             debug = "LINE";
             break;
         case ImagePickerMove::PG_DOWN:
-            preloadToIndex(selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps));
-            newSelectedShapeIdx = selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
+            preloadToIndex(
+                    selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps));
+            newSelectedShapeIdx =
+                    selectedShape->index + (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
             newSelectedShapeIdx = newSelectedShapeIdx > images->size() - 1 ? images->size() - 1 : newSelectedShapeIdx;
             canMove = newSelectedShapeIdx != selectedShape->index;
             debug = "PGDOWN";
             break;
         case ImagePickerMove::PG_UP:
-            newSelectedShapeIdx = selectedShape->index - (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
+            newSelectedShapeIdx =
+                    selectedShape->index - (shapeProperties.itemCounts.x * shapeProperties.itemCounts.y * steps);
             newSelectedShapeIdx = newSelectedShapeIdx > 0 ? newSelectedShapeIdx : 0;
             canMove = selectedShape->index != newSelectedShapeIdx;
             debug = "PGUP";
@@ -203,8 +252,10 @@ void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter, std::stri
     lastPreloadedImageIndex = 0;
     images->clear();
 
-    if(filterString.empty()) {
-        delete(this->images);
+    if (filterString.empty()) {
+        delete (this->images);
         this->images = new std::vector<Image>(allImages->begin(), allImages->end());
     }
+
+    redrawAllInNextFrame = true;
 }

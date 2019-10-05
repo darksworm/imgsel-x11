@@ -38,7 +38,6 @@ private:
 
         // TODO: these should be config options
         int screen_num = DefaultScreen(display);
-        unsigned int line_width = 2;
         int line_style = LineSolid;
         int cap_style = CapButt;
         int join_style = JoinBevel;
@@ -57,7 +56,7 @@ private:
         XSetBackground(display, gc, BlackPixel(display, screen_num));
 
         XSetLineAttributes(display, gc,
-                           line_width, line_style, cap_style, join_style);
+                           selectedShapeLineWidth, line_style, cap_style, join_style);
         XSetFillStyle(display, gc, FillSolid);
 
         return gc;
@@ -82,6 +81,7 @@ protected:
     GC shapeGC;
     GC selectedShapeGC;
     GC textGC;
+    unsigned int selectedShapeLineWidth = 2;
 
     WindowManager *windowManager;
     XPoint *lastShapePosition = nullptr;
@@ -93,6 +93,10 @@ protected:
     virtual ShapeProperties calcShapeProps(Window window) = 0;
 
     virtual XPoint *getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) = 0;
+
+    virtual void drawSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) = 0;
+
+    virtual void clearSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) = 0;
 
 public:
     ShapeDrawer(WindowManager *windowManager) {
