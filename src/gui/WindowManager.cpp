@@ -10,8 +10,7 @@ typedef struct {
     unsigned long status;
 } Hints;
 
-unsigned long RGBA2DWORD(int iR, int iG, int iB, int iA)
-{
+unsigned long RGBA2DWORD(int iR, int iG, int iB, int iA) {
     return ((iA * 256 + iR) * 256 + iG) * 256 + iB;
 }
 
@@ -39,36 +38,39 @@ void WindowManager::setWindowSettings() {
 
     auto window_type = XInternAtom(display, "_NET_WM_WINDOW_TYPE", false);
     property = XInternAtom(display, "_NET_WM_WINDOW_TYPE_SPLASH", false);
-    XChangeProperty(display, this->window, window_type, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&property), 1);
+    XChangeProperty(display, this->window, window_type, XA_ATOM, 32, PropModeReplace,
+                    reinterpret_cast<unsigned char *>(&property), 1);
 
     auto windowState = XInternAtom(display, "_NET_WM_STATE", false);
     Atom windowStates[] = {
-        XInternAtom(display, "_NET_WM_STATE_MODAL", false),
-        XInternAtom(display, "_NET_WM_STATE_ABOVE", false),
-        XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", false)
+            XInternAtom(display, "_NET_WM_STATE_MODAL", false),
+            XInternAtom(display, "_NET_WM_STATE_ABOVE", false),
+            XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", false)
     };
 
-    XChangeProperty(display, this->window, windowState, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char*>(&windowStates), 1);
+    XChangeProperty(display, this->window, windowState, XA_ATOM, 32, PropModeReplace,
+                    reinterpret_cast<unsigned char *>(&windowStates), 1);
 
     property = XInternAtom(display, "I3_FLOATING_WINDOW", false);
-    XChangeProperty(display, this->window, property, XA_CARDINAL, 32, PropertyNewValue, reinterpret_cast<unsigned char*>(&property), 1);
+    XChangeProperty(display, this->window, property, XA_CARDINAL, 32, PropertyNewValue,
+                    reinterpret_cast<unsigned char *>(&property), 1);
 
     auto screenDimensions = this->getScreenDimensions();
 
-	XSizeHints *size_hints = XAllocSizeHints();
-	size_hints->min_width = (int) screenDimensions.x;
-	size_hints->min_height = (int) screenDimensions.y;
-	size_hints->max_width = (int) screenDimensions.x;
-	size_hints->max_height = (int) screenDimensions.y;
-	size_hints->width = (int) screenDimensions.x;
-	size_hints->height = (int) screenDimensions.y;
-	size_hints->x = 0;
-	size_hints->y = 0;
-	size_hints->win_gravity = CenterGravity;
-	size_hints->flags = PMinSize|PMaxSize|PPosition|PSize|PWinGravity;
-	XSetWMNormalHints(display, window, size_hints);
+    XSizeHints *size_hints = XAllocSizeHints();
+    size_hints->min_width = (int) screenDimensions.x;
+    size_hints->min_height = (int) screenDimensions.y;
+    size_hints->max_width = (int) screenDimensions.x;
+    size_hints->max_height = (int) screenDimensions.y;
+    size_hints->width = (int) screenDimensions.x;
+    size_hints->height = (int) screenDimensions.y;
+    size_hints->x = 0;
+    size_hints->y = 0;
+    size_hints->win_gravity = CenterGravity;
+    size_hints->flags = PMinSize | PMaxSize | PPosition | PSize | PWinGravity;
+    XSetWMNormalHints(display, window, size_hints);
 
-	XFree(size_hints);
+    XFree(size_hints);
 
     XMapWindow(display, this->window);
     XMapRaised(display, this->window);
@@ -76,9 +78,8 @@ void WindowManager::setWindowSettings() {
     XFlush(display);
 }
 
-Display* WindowManager::getDisplay() {
-    if( this->display == nullptr )
-    {
+Display *WindowManager::getDisplay() {
+    if (this->display == nullptr) {
         // TODO: can there be multiple displays?
         this->display = XOpenDisplay(nullptr);
     }
@@ -87,30 +88,57 @@ Display* WindowManager::getDisplay() {
 }
 
 Dimensions WindowManager::getScreenDimensions() {
-    Display* display = this->getDisplay();
+    if (this->screenDimensions.x > 0) {
+        return this->screenDimensions;
+    }
+
+    Display *display = this->getDisplay();
+    Dimensions dim(0, 0);
+
+    // Get the mouse cursor position
+    int win_x, win_y, root_x, root_y = 0;
+    unsigned int mask = 0;
+    Window child_win, root_win;
+    XQueryPointer(display, XRootWindow(display, 0),
+                  &child_win, &root_win,
+                  &root_x, &root_y, &win_x, &win_y, &mask);
 
     auto screenCount = ScreenCount(display);
-    if(screenCount > 1) {
+    if (screenCount > 1) {
         // TODO: figure out which screen is the main one
     }
 
-    if(XineramaIsActive(display)) {
+    if (XineramaIsActive(display)) {
         int num;
         auto screenInfo = XineramaQueryScreens(display, &num);
 
-        return Dimensions(screenInfo->width, screenInfo->height);
+        for (auto current = screenInfo; current <= screenInfo + num - 1; ++current) {
+            if (current->x_org <= root_x && current->width >= root_x && current->y_org <= root_y &&
+                current->height >= root_y) {
+                dim.x = current->width;
+                dim.y = current->height;
+                break;
+            }
+        }
+
+        XFree(screenInfo);
     }
 
-    auto screen = DefaultScreenOfDisplay(display);
-    return Dimensions(screen->width, screen->height);
+    if (dim.x == 0) {
+        auto screen = DefaultScreenOfDisplay(display);
+        dim = Dimensions(screen->width, screen->height);
+    }
+
+    this->screenDimensions = dim;
+    return this->screenDimensions;
 }
 
 void WindowManager::newWindow() {
     // TODO: handle multiple screens?
     auto screenDimensions = this->getScreenDimensions();
 
-    int height = (int)screenDimensions.x;
-    int width = (int)screenDimensions.y;
+    int height = (int) screenDimensions.x;
+    int width = (int) screenDimensions.y;
 
     XMatchVisualInfo(display, DefaultScreen(display), getDepth(), TrueColor, &vInfo);
 
@@ -123,25 +151,24 @@ void WindowManager::newWindow() {
     attr.background_pixel = RGBA2DWORD(0, 0, 0, 200);
 
     this->window = XCreateWindow(display, DefaultRootWindow(display), 0, 0, (unsigned) width, (unsigned) height, 0,
-                               vInfo.depth, InputOutput,
-                               vInfo.visual, CWColormap | CWBorderPixel | CWBackPixel | FocusChangeMask, &attr);
+                                 vInfo.depth, InputOutput,
+                                 vInfo.visual, CWColormap | CWBorderPixel | CWBackPixel | FocusChangeMask, &attr);
 
     this->setWindowSettings();
 }
 
 
 Window WindowManager::getWindow() {
-    if( !this->window )
-    {
-       this->newWindow();
+    if (!this->window) {
+        this->newWindow();
     }
 
     return this->window;
 }
 
 void WindowManager::destroyWindow() {
-    XDestroyWindow( this->getDisplay(), this->getWindow() );
-    XCloseDisplay( this->getDisplay() );
+    XDestroyWindow(this->getDisplay(), this->getWindow());
+    XCloseDisplay(this->getDisplay());
 }
 
 void WindowManager::getWindowDimensions(unsigned int *width, unsigned int *height) {

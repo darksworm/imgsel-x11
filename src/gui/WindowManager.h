@@ -16,6 +16,7 @@ private:
     Window window;
     XVisualInfo vInfo;
     Colormap colorMap;
+    Dimensions screenDimensions = Dimensions(0,0);
 public:
     Window getWindow();
     Display* getDisplay();
