@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.4)
 
 project(IMGSEL)
 
@@ -20,13 +20,13 @@ if(!Imlib2_FOUND)
     message( FATAL_ERROR "Imlib2 is required!")
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${X11_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${XTST_LIBRARY})
-target_link_libraries(${PROJECT_NAME} stdc++fs)
-target_link_libraries(${PROJECT_NAME} ${YAML_LIB})
-target_link_libraries(${PROJECT_NAME} ${Imlib2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${XTST_LIBRARY} ${X11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Xinerama stdc++fs)
+target_link_libraries(${PROJECT_NAME} ${YAML_LIB} ${Imlib2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} keycode)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
+if (NOT X11_Xinerama_FOUND)
+  message(FATAL_ERROR "The Xinerama headers were not found")
+endif()
 
 find_program(
   CLANG_TIDY_EXE

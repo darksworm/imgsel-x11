@@ -1,5 +1,6 @@
 #include "WindowManager.h"
 #include <X11/Xatom.h>
+#include <X11/extensions/Xinerama.h>
 
 typedef struct {
     unsigned long flags;
@@ -52,13 +53,15 @@ void WindowManager::setWindowSettings() {
     property = XInternAtom(display, "I3_FLOATING_WINDOW", false);
     XChangeProperty(display, this->window, property, XA_CARDINAL, 32, PropertyNewValue, reinterpret_cast<unsigned char*>(&property), 1);
 
+    auto screenDimensions = this->getScreenDimensions();
+
 	XSizeHints *size_hints = XAllocSizeHints();
-	size_hints->min_width = this->getScreen()->width;
-	size_hints->min_height = this->getScreen()->height;
-	size_hints->max_width = this->getScreen()->width;
-	size_hints->max_height = this->getScreen()->height;
-	size_hints->width = this->getScreen()->width;
-	size_hints->height = this->getScreen()->height;
+	size_hints->min_width = (int) screenDimensions.x;
+	size_hints->min_height = (int) screenDimensions.y;
+	size_hints->max_width = (int) screenDimensions.x;
+	size_hints->max_height = (int) screenDimensions.y;
+	size_hints->width = (int) screenDimensions.x;
+	size_hints->height = (int) screenDimensions.y;
 	size_hints->x = 0;
 	size_hints->y = 0;
 	size_hints->win_gravity = CenterGravity;
@@ -83,23 +86,36 @@ Display* WindowManager::getDisplay() {
     return this->display;
 }
 
-Screen* WindowManager::getScreen() {
+Dimensions WindowManager::getScreenDimensions() {
     Display* display = this->getDisplay();
 
-    return DefaultScreenOfDisplay(display);
+    auto screenCount = ScreenCount(display);
+    if(screenCount > 1) {
+        // TODO: figure out which screen is the main one
+    }
+
+    if(XineramaIsActive(display)) {
+        int num;
+        auto screenInfo = XineramaQueryScreens(display, &num);
+
+        return Dimensions(screenInfo->width, screenInfo->height);
+    }
+
+    auto screen = DefaultScreenOfDisplay(display);
+    return Dimensions(screen->width, screen->height);
 }
 
 void WindowManager::newWindow() {
     // TODO: handle multiple screens?
-    Screen* screen = this->getScreen();
+    auto screenDimensions = this->getScreenDimensions();
 
-    int height = screen->height;
-    int width = screen->width;
+    int height = (int)screenDimensions.x;
+    int width = (int)screenDimensions.y;
 
     XMatchVisualInfo(display, DefaultScreen(display), getDepth(), TrueColor, &vInfo);
 
     colorMap = XCreateColormap(display, DefaultRootWindow(display), vInfo.visual, AllocNone);
-    
+
     XSetWindowAttributes attr;
     attr.colormap = colorMap;
     attr.border_pixel = 0;

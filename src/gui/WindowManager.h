@@ -3,10 +3,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/xf86vmode.h>
+#include "dimensions.h"
 
 class WindowManager {
 private:
-    Screen* getScreen();
+    Dimensions getScreenDimensions();
 
     void setWindowSettings();
     void newWindow();
