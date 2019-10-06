@@ -10,7 +10,6 @@ add_executable(${PROJECT_NAME} main.cpp gui/WindowManager.cpp input/KeyboardMana
 add_subdirectory(lib/keycode)
 
 FIND_PACKAGE(X11)
-FIND_LIBRARY(YAML_LIB yaml-cpp)
 find_library(XTST_LIBRARY Xtst)
 
 find_package(Imlib2)
@@ -21,7 +20,7 @@ if(!Imlib2_FOUND)
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${XTST_LIBRARY} ${X11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Xinerama stdc++fs)
-target_link_libraries(${PROJECT_NAME} ${YAML_LIB} ${Imlib2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${Imlib2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} keycode)
 
 if (NOT X11_Xinerama_FOUND)

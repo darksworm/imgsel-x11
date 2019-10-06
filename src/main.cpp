@@ -4,10 +4,8 @@
 #include <Imlib2.h>
 
 #include "gui/WindowManager.h"
-#include "lib/keycode/keycode.h"
 #include "gui/drawer/ShapeDrawerFactory.h"
 
-#include "input/x11_keycodes.h"
 #include "config/ConfigManager.h"
 #include "util/ThreadSafeQueue.h"
 #include "input/XEventWrapper.h"
