@@ -62,10 +62,10 @@ void drawText(WindowManager *windowManager, const std::string &text, Dimensions 
     XClearArea(
             windowManager->getDisplay(),
             windowManager->getWindow(),
-            position.x,
-            position.y,
-            300,
-            40,
+            position.x - 10,
+            position.y - 10,
+            320,
+            60,
             false
     );
 
@@ -274,6 +274,9 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
 
         if (!itemPickerDrawer->getFilterString().empty()) {
             drawText(windowManager, "QUERY: " + itemPickerDrawer->getFilterString(), Dimensions(500, 100));
+        } else {
+            // this should clear the previous query
+            drawText(windowManager, "", Dimensions(500,100));
         }
     }
 
