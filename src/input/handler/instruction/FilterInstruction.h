@@ -1,9 +1,7 @@
-#include <utility>
+#pragma once
 
 #include <utility>
 #include <functional>
-
-#pragma once
 
 #include "Instruction.h"
 #include "../../../image/image.h"

@@ -1,4 +1,4 @@
-
+#pragma once
 #include "Instruction.h"
 #include "../../../gui/ImagePickerDrawer.h"
 
