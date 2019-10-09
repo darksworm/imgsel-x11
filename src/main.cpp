@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     XGetKeyboardControl(display, &initKBState);
 
     ThreadSafeQueue<XEventWrapper> eventQueue;
-    bool shouldQuit;
+    bool shouldQuit = false;
 
     std::thread xEventListener(handleXInput, windowManager, &eventQueue, &shouldQuit);
     std::thread xEventHandler(handleEvents, windowManager, &eventQueue, images, &shouldQuit);
