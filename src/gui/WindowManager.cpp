@@ -36,11 +36,6 @@ void WindowManager::setWindowSettings() {
     property = XInternAtom(display, "_MOTIF_WM_HINTS", true);
     XChangeProperty(display, this->window, property, property, 32, PropModeReplace, (unsigned char *) &hints, 5);
 
-    auto window_type = XInternAtom(display, "_NET_WM_WINDOW_TYPE", false);
-    property = XInternAtom(display, "_NET_WM_WINDOW_TYPE_SPLASH", false);
-    XChangeProperty(display, this->window, window_type, XA_ATOM, 32, PropModeReplace,
-                    reinterpret_cast<unsigned char *>(&property), 1);
-
     auto windowState = XInternAtom(display, "_NET_WM_STATE", false);
     Atom windowStates[] = {
             XInternAtom(display, "_NET_WM_STATE_MODAL", false),
@@ -72,9 +67,29 @@ void WindowManager::setWindowSettings() {
 
     XFree(size_hints);
 
-    XMapWindow(display, this->window);
+    int insets[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    insets[2] = screenDimensions.y;
+    insets[8] = 0;
+    insets[9] = screenDimensions.x;
+
+    XChangeProperty(display,
+                    window,
+                    XInternAtom(display, "_NET_WM_STRUT", False),
+                    XA_CARDINAL,
+                    32,
+                    PropModeReplace,
+                    (unsigned char *) &insets, 4);
+
+    XChangeProperty(display,
+                    window,
+                    XInternAtom(display, "_NET_WM_STRUT_PARTIAL", False),
+                    XA_CARDINAL,
+                    32,
+                    PropModeReplace,
+                    (unsigned char *) &insets, 12);
+
     XMapRaised(display, this->window);
-    XSelectInput(display, this->window, StructureNotifyMask);
+    XMoveWindow(display, this->window, 0, 0);
     XFlush(display);
 }
 

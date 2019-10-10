@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME} main.cpp gui/WindowManager.cpp input/KeyboardMana
 add_subdirectory(lib/keycode)
 
 FIND_PACKAGE(X11)
-pkg_check_modules(X11 REQUIRED x11 xinerama xtst xcomposite)
+pkg_check_modules(X11 REQUIRED x11 xinerama xtst)
 find_library(XTST_LIBRARY Xtst)
 
 find_package(Imlib2)
@@ -20,7 +20,7 @@ if(!Imlib2_FOUND)
     message( FATAL_ERROR "Imlib2 is required!")
 endif()
 
-target_link_libraries(${PROJECT_NAME} ${XTST_LIBRARY} ${X11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${XCOMPOSITE_LIBRARIES} ${XINERAMA_LIBRARIES} stdc++fs)
+target_link_libraries(${PROJECT_NAME} ${XTST_LIBRARY} ${X11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${XINERAMA_LIBRARIES} stdc++fs)
 target_link_libraries(${PROJECT_NAME} ${Imlib2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} keycode)
 
