@@ -1,5 +1,6 @@
 #include <Imlib2.h>
 #include "ImageDrawer.h"
+#include "../../exceptions/ImageNotLoadable.h"
 
 
 Shape ImageDrawer::calcNextShape(ShapeProperties properties, Image *hotkey, bool selected, long index) {
@@ -19,7 +20,7 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 
     if (!img) {
         fprintf(stderr, "%s:Unable to load image\n", shape.image->getPath().c_str());
-        throw 0;
+        throw ImageNotLoadable();
     }
 
     imlib_context_set_image(img);

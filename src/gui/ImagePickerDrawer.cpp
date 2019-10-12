@@ -3,6 +3,7 @@
 #include "ImagePickerDrawer.h"
 #include "../exceptions/OutOfBounds.h"
 #include "dimensions.h"
+#include "../exceptions/ImageNotLoadable.h"
 #include <memory>
 
 ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager, std::vector<Image> *images) {
@@ -78,7 +79,16 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
         shape.selected = selected;
 
         if (shouldDrawShape) {
-            shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
+            try {
+                shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
+            } catch (ImageNotLoadable &e) {
+                images->erase(it);
+                if(--it < start) {
+                    break;
+                } else {
+                    continue;
+                }
+            }
         }
 
         shapes.emplace(drawnShapeCnt, shape);

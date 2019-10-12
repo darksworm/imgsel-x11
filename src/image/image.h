@@ -5,7 +5,7 @@
 
 class Image {
 private:
-    const std::string path;
+    std::string path;
     std::string filename;
     std::string extension;
     Imlib_Image image = nullptr;
