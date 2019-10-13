@@ -24,13 +24,14 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    // TODO: disabled this temporarily as it is bugging the fuck out
     // TODO: is /tmp a good directory for a pid file?
-    int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
-    int rc = flock(pid_file, LOCK_EX | LOCK_NB);
-    if (rc && EWOULDBLOCK == errno) {
-        std::cout << "another proccess is already running!";
-        exit(1);
-    }
+//    int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
+//    int rc = flock(pid_file, LOCK_EX | LOCK_NB);
+//    if (rc && EWOULDBLOCK == errno) {
+//        std::cout << "another proccess is already running!";
+//        exit(1);
+//    }
 
     std::vector<std::string> imageFiles = glob(argv[1]);
     auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
