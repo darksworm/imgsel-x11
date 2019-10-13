@@ -5,9 +5,9 @@
 
 class Image {
 private:
-    std::string path;
-    std::string filename;
-    std::string extension;
+    std::string path = "";
+    std::string filename = "";
+    std::string extension = "";
 public:
     Image(std::string path) : path(std::move(path)) {
         auto lastDotPos = this->path.find_last_of('.');
