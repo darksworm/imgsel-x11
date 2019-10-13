@@ -4,7 +4,10 @@
 #include "ConfigBuilder.h"
 
 void ConfigManager::loadConfig() {
-    ConfigManager::config = ConfigBuilder().setIsDebug(DEBUG).build();
+    ConfigManager::config = ConfigBuilder()
+            .setIsDebug(DEBUG)
+            .setImageCacheSizeBytes(1024 * 1024 * 100)
+            .build();
 }
 
 Config* ConfigManager::getOrLoadConfig() {

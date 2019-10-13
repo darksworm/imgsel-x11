@@ -5,9 +5,14 @@ class Config {
 
 private:
     bool isDebug;
+    unsigned int imageCacheSizeBytes;
     Config() = default;
 public:
     bool isIsDebug() const {
         return isDebug;
+    }
+
+    unsigned int getImageCacheSizeBytes() {
+        return imageCacheSizeBytes;
     }
 };

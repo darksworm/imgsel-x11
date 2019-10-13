@@ -12,11 +12,7 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     Pixmap pix;
     int width, height;
 
-    if (shape.image->getImg() == nullptr) {
-        shape.image->setImg(imlib_load_image(shape.image->getPath().c_str()));
-    }
-
-    img = shape.image->getImg();
+    img = imlib_load_image(shape.image->getPath().c_str());
 
     if (!img) {
         fprintf(stderr, "%s:Unable to load image\n", shape.image->getPath().c_str());

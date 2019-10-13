@@ -52,6 +52,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // set up cache for images
+    imlib_set_cache_size(config->getImageCacheSizeBytes());
+
     auto windowManager = new WindowManager();
 
     Display *display = windowManager->getDisplay();

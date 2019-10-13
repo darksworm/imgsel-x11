@@ -14,6 +14,11 @@ public:
         config->isDebug = isDebug;
         return *this;
     }
+    
+    ConfigBuilder& setImageCacheSizeBytes(unsigned int bytes) {
+        config->imageCacheSizeBytes = bytes;
+        return *this;
+    }
 
     Config* build() {
         return config;
