@@ -6,7 +6,7 @@
 void ConfigManager::loadConfig() {
     ConfigManager::config = ConfigBuilder()
             .setIsDebug(DEBUG)
-            .setImageCacheSizeBytes(1024 * 1024 * 100)
+            .setImageCacheSizeBytes(cliParams.cacheSize)
             .build();
 }
 
@@ -20,4 +20,8 @@ Config* ConfigManager::getOrLoadConfig() {
 
 ConfigManager::ConfigManager() {
     ConfigManager::configLoaded = false;
+}
+
+void ConfigManager::setCLIParams(CLIParams params) {
+    ConfigManager::cliParams = params;
 }

@@ -18,6 +18,7 @@
 #include <cerrno>
 #include "input/InstructionRouter.h"
 #include "input/XInputHandler.h"
+#include "util/helpers.h"
 
 int main(int argc, char *argv[]) {
     if (!XInitThreads()) {
@@ -27,21 +28,17 @@ int main(int argc, char *argv[]) {
 
     CLI::App app{"IMGSEL - Image selection tool."};
 
-    std::vector<std::string> imageFiles;
-    app.add_option("--files", imageFiles, "List of images to display")
+    CLIParams params = CLIParams();
+
+    app.add_option("--files", params.imageFiles, "List of images to display")
         ->required()
         ->check(CLI::ExistingFile);
+
+    app.add_option("--cache-size", params.cacheSize, "How many (max) bytes of memory to use for caching loaded images", 1024 * 1024 * 100);
+
     CLI11_PARSE(app, argc, argv);
 
-    // TODO: disabled this temporarily as it is bugging the fuck out
-    // TODO: is /tmp a good directory for a pid file?
-//    int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
-//    int rc = flock(pid_file, LOCK_EX | LOCK_NB);
-//    if (rc && EWOULDBLOCK == errno) {
-//        std::cout << "another proccess is already running!";
-//        exit(1);
-//    }
-
+    ConfigManager::setCLIParams(params);
     auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
 
     std::vector<std::string> imageExtensions = {
@@ -52,7 +49,7 @@ int main(int argc, char *argv[]) {
     };
 
     std::vector<Image> images;
-    for (const auto &img:imageFiles) {
+    for (const auto &img:params.imageFiles) {
         for (const auto &ext:imageExtensions) {
             if (img.length() >= ext.length() && 0 == img.compare(img.length() - ext.length(), ext.length(), ext)) {
                 images.emplace_back(img);
