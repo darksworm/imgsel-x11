@@ -2,3 +2,6 @@
 	path = src/lib/keycode/depp-keycode
 	url = https://github.com/depp/keycode
 	branch = master
+[submodule "src/lib/CLI11"]
+	path = src/lib/CLI11
+	url = https://github.com/CLIUtils/CLI11

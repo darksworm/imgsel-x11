@@ -1,5 +1,7 @@
 #include <iostream>
 #include <thread>
+#include "lib/CLI11/include/CLI/CLI.hpp"
+
 #include <X11/extensions/XTest.h>
 #include <Imlib2.h>
 
