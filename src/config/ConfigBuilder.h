@@ -20,6 +20,11 @@ public:
         return *this;
     }
 
+    ConfigBuilder& setDefaultInputMode(InputMode mode) {
+        config->defaultInputMode = mode;
+        return *this;
+    }
+
     Config* build() {
         return config;
     }

@@ -14,4 +14,5 @@ void drawText(WindowManager *windowManager, const std::string &text, Dimensions 
 struct CLIParams {
     unsigned int cacheSize;
     std::vector<std::string> imageFiles;
+    bool startInVimMode;
 };

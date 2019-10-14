@@ -12,7 +12,7 @@ std::string TextFilteringInputHandler::getFilterText() {
 }
 
 InputMode TextFilteringInputHandler::getNextMode() {
-    return InputMode::SELECTION;
+    return InputMode::VIM;
 }
 
 std::function<bool(Image *)> TextFilteringInputHandler::getFilter() {

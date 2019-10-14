@@ -20,7 +20,7 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
         switch (keyCode) {
             case KEY_SLASH:
                 delete instruction;
-                instruction = new ModeChangeInstruction(InputMode::TEXT_FILTER);
+                instruction = new ModeChangeInstruction(InputMode::DEFAULT);
                 break;
             case KEY_H:
                 move = ImagePickerMove::LEFT;
@@ -44,7 +44,7 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
             instruction = new MoveInstruction(move, repeatNextCommandTimes);
         } else if (keyCode == KEY_C) {
             // change to the same mode, but clear filters.
-            instruction = new ModeChangeInstruction(InputMode::SELECTION, 0, false, true);
+            instruction = new ModeChangeInstruction(InputMode::VIM, 0, false, true);
         }
     }
 
@@ -86,5 +86,5 @@ Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
 }
 
 InputMode SelectionInputHandler::getNextMode() {
-    return InputMode::TEXT_FILTER;
+    return InputMode::DEFAULT;
 }

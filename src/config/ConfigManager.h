@@ -5,7 +5,7 @@
 
 class ConfigManager {
 public:
-    static Config* getOrLoadConfig();
+    static Config getOrLoadConfig();
     ConfigManager();
     static void setCLIParams(CLIParams params);
 private:

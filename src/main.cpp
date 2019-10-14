@@ -30,16 +30,19 @@ int main(int argc, char *argv[]) {
 
     CLIParams params = CLIParams();
 
-    app.add_option("--files", params.imageFiles, "List of images to display")
-        ->required()
-        ->check(CLI::ExistingFile);
+    app.add_option("--files", params.imageFiles, "List of images to display.")
+            ->required()
+            ->check(CLI::ExistingFile);
 
-    app.add_option("--cache-size", params.cacheSize, "How many (max) bytes of memory to use for caching loaded images", 1024 * 1024 * 100);
+    app.add_option("--cache-size", params.cacheSize, "How many (max) bytes of memory to use for caching loaded images.",
+                   1024 * 1024 * 100);
+
+    app.add_flag("--vim", params.startInVimMode, "Set the initial mode to VIM mode.");
 
     CLI11_PARSE(app, argc, argv);
 
     ConfigManager::setCLIParams(params);
-    auto config = std::unique_ptr<Config>(ConfigManager::getOrLoadConfig());
+    auto config = ConfigManager::getOrLoadConfig();
 
     std::vector<std::string> imageExtensions = {
             "jpg",
@@ -59,7 +62,7 @@ int main(int argc, char *argv[]) {
     }
 
     // set up cache for images
-    imlib_set_cache_size(config->getImageCacheSizeBytes());
+    imlib_set_cache_size(config.getImageCacheSizeBytes());
 
     auto windowManager = new WindowManager();
 

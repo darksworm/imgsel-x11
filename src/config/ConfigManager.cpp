@@ -7,15 +7,16 @@ void ConfigManager::loadConfig() {
     ConfigManager::config = ConfigBuilder()
             .setIsDebug(DEBUG)
             .setImageCacheSizeBytes(cliParams.cacheSize)
+            .setDefaultInputMode(cliParams.startInVimMode ? InputMode::VIM : InputMode::DEFAULT)
             .build();
 }
 
-Config* ConfigManager::getOrLoadConfig() {
+Config ConfigManager::getOrLoadConfig() {
     if (!ConfigManager::configLoaded) {
         loadConfig();
     }
 
-    return ConfigManager::config;
+    return *ConfigManager::config;
 }
 
 ConfigManager::ConfigManager() {
@@ -23,5 +24,5 @@ ConfigManager::ConfigManager() {
 }
 
 void ConfigManager::setCLIParams(CLIParams params) {
-    ConfigManager::cliParams = params;
+    ConfigManager::cliParams = std::move(params);
 }

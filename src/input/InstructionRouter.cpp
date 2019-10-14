@@ -14,7 +14,7 @@
 #include "handler/instruction/FilterInstruction.h"
 #include "handler/instruction/CopyInstruction.h"
 #include "../util/helpers.h"
-#include "InstructionRouter.h"
+#include "../config/ConfigManager.h"
 
 void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *eventQueue,
                   std::vector<Image> images, bool *shouldQuit) {
@@ -22,11 +22,12 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             new ImagePickerDrawer(windowManager, &images)
     );
 
+    auto config = ConfigManager::getOrLoadConfig();
     std::unique_ptr<InputHandler> inputHandler(nullptr);
 
     bool keep_running = true, readEvent;
     XEventWrapper event;
-    InputMode state = InputMode::TEXT_FILTER;
+    InputMode state = config.getDefaultInputMode();
 
     bool initialFrameDrawn = false;
 
@@ -59,7 +60,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                            : &*images.begin();
             itemPickerDrawer->drawFrame(hk);
-            drawText(windowManager, "You're in TEXT_FILTER mode", Dimensions(900, 150));
+            drawText(windowManager, "You're in DEFAULT mode", Dimensions(900, 150));
             drawText(windowManager, "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
 
             initialFrameDrawn = true;
@@ -140,7 +141,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             keep_running = false;
         }
 
-        static const std::string inputModes[] = {"SELECTION", "TEXT_FILTER"};
+        static const std::string inputModes[] = {"VIM", "DEFAULT"};
         drawText(windowManager, "You're in " + inputModes[(int) state] + " mode", Dimensions(900, 150));
         drawText(windowManager, "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
 
