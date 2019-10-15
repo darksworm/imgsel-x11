@@ -14,8 +14,6 @@
 
 #include <vector>
 #include <string>
-#include <sys/file.h>
-#include <cerrno>
 #include "input/InstructionRouter.h"
 #include "input/XInputHandler.h"
 #include "util/helpers.h"

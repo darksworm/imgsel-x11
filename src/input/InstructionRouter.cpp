@@ -54,15 +54,15 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             continue;
         }
 
-        if (event.eventType == ConfigureNotify) {
-            if(initialFrameDrawn) {
+        if (event.eventType == ConfigureNotify || event.eventType == Expose) {
+            if(initialFrameDrawn && event.eventType == ConfigureNotify) {
                 continue;
             }
 
             windowManager->getWindowDimensions(&width, &height);
             auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                            : &*images.begin();
-            itemPickerDrawer->drawFrame(hk);
+            itemPickerDrawer->drawFrame(hk, true);
             drawText(windowManager, state == InputMode::DEFAULT ? "DEFAULT" : "VIM", Dimensions(10, height - 10));
 
             initialFrameDrawn = true;

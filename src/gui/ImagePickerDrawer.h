@@ -60,7 +60,7 @@ private:
 public:
     ImagePickerDrawer(WindowManager* windowManager, std::vector<Image> *images);
 
-    void drawFrame(Image* selectedImage);
+    void drawFrame(Image* selectedImage, bool redrawAll = false);
 
     bool move(ImagePickerMove move, unsigned int steps = 1);
 

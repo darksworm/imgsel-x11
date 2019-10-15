@@ -17,7 +17,7 @@ ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager, std::vector<I
     shapeProperties = shapeDrawer->calcShapeProps(windowManager->getWindow());
 }
 
-void ImagePickerDrawer::drawFrame(Image *selectedImage) {
+void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
     auto start = getPageImageStart();
 
     auto oldShapes = std::map<long, Shape>();
@@ -33,6 +33,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
     int drawnShapeCnt = 0;
 
     auto it = start;
+    redrawAll = redrawAll || redrawAllInNextFrame;
 
     for (; it != images->end(); ++it) {
         if (filter && !filter(&*it)) {
@@ -55,7 +56,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage) {
         try {
             auto oldShape = oldShapes.at(drawnShapeCnt);
 
-            if (!redrawAllInNextFrame && oldShape.image->getPath() == shape.image->getPath()) {
+            if (!redrawAll && oldShape.image->getPath() == shape.image->getPath()) {
                 shouldDrawShape = false;
                 shape = oldShape;
                 shapeDrawer->lastShapePosition = &oldShape.position;
