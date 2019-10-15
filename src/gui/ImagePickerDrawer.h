@@ -49,7 +49,7 @@ private:
 
     void goToImage(long hotkeyIdx);
 
-    std::function<bool(Image*)> filter;
+    std::optional<std::function<bool(Image*)>> filter;
 
     std::string filterString = "";
 
@@ -65,6 +65,8 @@ public:
     bool move(ImagePickerMove move, unsigned int steps = 1);
 
     void setFilter(std::function<bool(Image *)> filter, std::string filterString);
+
+    void clearFilter();
 
     Image* getSelectedImage();
 

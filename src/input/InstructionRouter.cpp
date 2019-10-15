@@ -101,7 +101,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         }
 
         if (instruction->getType() == InstructionType::CANCEL) {
-            itemPickerDrawer->setFilter(nullptr, "");
+            itemPickerDrawer->clearFilter();
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<MoveInstruction *>(instruction.get())) {
             auto moveInstruction = ((MoveInstruction *) instruction.get());
@@ -121,14 +121,18 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             state = modeChangeInstruction->newMode;
 
             if (modeChangeInstruction->shouldClearFilters) {
-                itemPickerDrawer->setFilter(nullptr, "");
+                itemPickerDrawer->clearFilter();
             }
 
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<FilterInstruction *>(instruction.get())) {
             auto filterInstruction = ((FilterInstruction *) instruction.get());
 
-            itemPickerDrawer->setFilter(filterInstruction->getFilter(), filterInstruction->getFilterString());
+            if(!filterInstruction->getFilterString().empty()) {
+                itemPickerDrawer->setFilter(filterInstruction->getFilter(), filterInstruction->getFilterString());
+            } else {
+                itemPickerDrawer->clearFilter();
+            }
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<CopyInstruction *>(instruction.get())) {
             auto selectedImage = itemPickerDrawer->getSelectedImage();

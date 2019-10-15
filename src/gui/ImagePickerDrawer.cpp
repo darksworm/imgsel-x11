@@ -36,7 +36,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
     redrawAll = redrawAll || redrawAllInNextFrame;
 
     for (; it != images->end(); ++it) {
-        if (filter && !filter(&*it)) {
+        if (filter.has_value() && !filter.operator*()(&*it)) {
             continue;
         }
 
@@ -133,7 +133,7 @@ std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
 }
 
 void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
-    if (filter && images->size() < (long) targetIndex + 1) {
+    if (filter.has_value() && images->size() < (long) targetIndex + 1) {
         std::cout << "Loading page...\n";
         unsigned int offset = 0;
 
@@ -149,7 +149,7 @@ void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
         unsigned int targetImageCount = ((targetIndex / hotkeysPerPage) + 1) * hotkeysPerPage;
 
         for (auto it = allImages->begin() + offset; it != allImages->end(); ++it) {
-            if (filter(&*it)) {
+            if (filter.operator*()(&*it)) {
                 images->push_back(*it);
                 lastPreloadedImageIndex = std::distance(allImages->begin(), it);
 
@@ -272,16 +272,21 @@ Image *ImagePickerDrawer::getSelectedImage() {
 
 void ImagePickerDrawer::setFilter(std::function<bool(Image *)> filter, std::string filterString) {
     this->filter = std::move(filter);
-    this->filterString = filterString;
     this->page = 0;
-
     lastPreloadedImageIndex = 0;
+    redrawAllInNextFrame = true;
+    this->filterString = filterString;
     images->clear();
+}
 
-    if (filterString.empty()) {
-        delete (this->images);
-        this->images = new std::vector<Image>(allImages->begin(), allImages->end());
-    }
+void ImagePickerDrawer::clearFilter() {
+    this->page = 0;
+    lastPreloadedImageIndex = 0;
+    this->filterString = "";
+
+    this->filter.reset();
+    delete (this->images);
+    this->images = new std::vector<Image>(allImages->begin(), allImages->end());
 
     redrawAllInNextFrame = true;
 }
