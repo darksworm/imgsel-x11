@@ -23,7 +23,6 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
     );
 
     unsigned int width, height;
-    windowManager->getWindowDimensions(&width, &height);
 
     auto config = ConfigManager::getOrLoadConfig();
     std::unique_ptr<InputHandler> inputHandler(nullptr);
@@ -60,6 +59,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
                 continue;
             }
 
+            windowManager->getWindowDimensions(&width, &height);
             auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                            : &*images.begin();
             itemPickerDrawer->drawFrame(hk);
