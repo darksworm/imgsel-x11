@@ -22,6 +22,9 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             new ImagePickerDrawer(windowManager, &images)
     );
 
+    unsigned int width, height;
+    windowManager->getWindowDimensions(&width, &height);
+
     auto config = ConfigManager::getOrLoadConfig();
     std::unique_ptr<InputHandler> inputHandler(nullptr);
 
@@ -60,8 +63,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             auto hk = itemPickerDrawer->getSelectedImage() ? itemPickerDrawer->getSelectedImage()
                                                            : &*images.begin();
             itemPickerDrawer->drawFrame(hk);
-            drawText(windowManager, "You're in DEFAULT mode", Dimensions(900, 150));
-            drawText(windowManager, "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
+            drawText(windowManager, state == InputMode::DEFAULT ? "DEFAULT" : "VIM", Dimensions(10, height - 10));
 
             initialFrameDrawn = true;
             continue;
@@ -141,9 +143,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             keep_running = false;
         }
 
-        static const std::string inputModes[] = {"VIM", "DEFAULT"};
-        drawText(windowManager, "You're in " + inputModes[(int) state] + " mode", Dimensions(900, 150));
-        drawText(windowManager, "To change mode, press the CAPS LOCK key", Dimensions(900, 160));
+        drawText(windowManager, state == InputMode::DEFAULT ? "DEFAULT" : "VIM", Dimensions(10, height - 10));
 
         if (!itemPickerDrawer->getFilterString().empty()) {
             drawText(windowManager, "QUERY: " + itemPickerDrawer->getFilterString(), Dimensions(500, 100));
