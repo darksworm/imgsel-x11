@@ -2,7 +2,6 @@
 #include "../gui/WindowManager.h"
 #include "../util/ThreadSafeQueue.h"
 #include "XEventWrapper.h"
-#include "XInputHandler.h"
 
 void handleXInput(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *eventQueue, bool *shouldQuit) {
     auto display = windowManager->getDisplay();

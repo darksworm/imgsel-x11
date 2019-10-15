@@ -191,13 +191,24 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             break;
         case ImagePickerMove::UP:
             canMove = selectedShape->index - (steps * shapeProperties.itemCounts.x) >= 0;
-            newSelectedShapeIdx = selectedShape->index - (steps * shapeProperties.itemCounts.x);
+            if(canMove) {
+                newSelectedShapeIdx = selectedShape->index - (steps * shapeProperties.itemCounts.x);
+            } else {
+                newSelectedShapeIdx = selectedShape->index % shapeProperties.itemCounts.x;
+                canMove = true;
+            }
             debug = "UP";
             break;
         case ImagePickerMove::DOWN:
             preloadToIndex(selectedShape->index + (steps * shapeProperties.itemCounts.x));
             canMove = selectedShape->index + (steps * shapeProperties.itemCounts.x) < images->size();
-            newSelectedShapeIdx = selectedShape->index + (steps * shapeProperties.itemCounts.x);
+            if(canMove) {
+                newSelectedShapeIdx = selectedShape->index + (steps * shapeProperties.itemCounts.x);
+            } else {
+                newSelectedShapeIdx = ((images->size() / shapeProperties.itemCounts.x) * shapeProperties.itemCounts.x) + selectedShape->index % shapeProperties.itemCounts.x;
+                newSelectedShapeIdx = newSelectedShapeIdx >= images->size() ? images->size() - 1 : newSelectedShapeIdx;
+                canMove = true;
+            }
             debug = "DOWN";
             break;
         case ImagePickerMove::END:
@@ -213,9 +224,13 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             break;
         case ImagePickerMove::LINE:
             preloadToIndex(steps > 0 && shapeProperties.itemCounts.x * steps);
-            // TODO: this seems wrong
             canMove = steps > 0 && shapeProperties.itemCounts.x * steps < images->size();
-            newSelectedShapeIdx = shapeProperties.itemCounts.x * (steps - 1);
+            if(canMove) {
+                newSelectedShapeIdx = shapeProperties.itemCounts.x * (steps - 1);
+            } else {
+                canMove = true;
+                newSelectedShapeIdx = images->size() - 1;
+            }
             debug = "LINE";
             break;
         case ImagePickerMove::PG_DOWN:
