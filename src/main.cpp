@@ -37,6 +37,20 @@ int main(int argc, char *argv[]) {
 
     app.add_flag("--vim", params.startInVimMode, "Set the initial mode to VIM mode.");
 
+    auto rowCountOption = app.add_option("--rows", params.rows, "How many rows to display");
+    auto colCountOption = app.add_option("--cols", params.cols, "How many cols to display");
+
+    rowCountOption->needs(colCountOption);
+    colCountOption->needs(rowCountOption);
+
+    auto widthOption = app.add_option("--max-width", params.maxImageWidth,
+                                      "The max image width. Any images larger than this will be scaled to this width");
+    auto heightOption = app.add_option("--max-height", params.maxImageHeight,
+                                       "The max image height. Any images larger than this will be scaled to this height");
+
+    heightOption->needs(widthOption);
+    widthOption->needs(heightOption);
+
     CLI11_PARSE(app, argc, argv);
 
     ConfigManager::setCLIParams(params);
