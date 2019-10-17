@@ -28,4 +28,24 @@ public:
     Config* build() {
         return config;
     }
+
+    ConfigBuilder& setMaxImageHeight(unsigned int maxImageHeight) {
+        config->maxImageHeight = maxImageHeight;
+        return *this;
+    }
+
+    ConfigBuilder& setMaxImageWidth(unsigned int maxImageWidth) {
+        config->maxImageHeight = maxImageWidth;
+        return *this;
+    }
+
+    ConfigBuilder& setRows(unsigned int rows) {
+        config->rows = rows;
+        return *this;
+    }
+
+    ConfigBuilder& setCols(unsigned int cols) {
+        config->cols = cols;
+        return *this;
+    }
 };
