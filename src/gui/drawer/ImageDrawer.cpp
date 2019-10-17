@@ -1,6 +1,7 @@
 #include <Imlib2.h>
 #include "ImageDrawer.h"
 #include "../../exceptions/ImageNotLoadable.h"
+#include "../../config/ConfigManager.h"
 
 
 Shape ImageDrawer::calcNextShape(ShapeProperties properties, Image *hotkey, bool selected, long index) {
@@ -60,11 +61,13 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 }
 
 ShapeProperties ImageDrawer::calcShapeProps(Window window) {
-    // TODO: calculate dynamically
+    auto config = ConfigManager::getOrLoadConfig();
+
+    // TODO: calculate missing props dynamically
     ShapeProperties shapeProperties{
             .dimensions = Dimensions(300, 150),
             .margins = Dimensions(20, 20),
-            .itemCounts = Dimensions(4, 4),
+            .itemCounts = Dimensions(config.getRows() > 0 ? config.getRows() : 4, config.getCols() > 0 ? config.getCols() : 4),
             .topTextRect = XRectangle{
                     .x = 10,
                     .y = 20,
