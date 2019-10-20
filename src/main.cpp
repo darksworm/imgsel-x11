@@ -48,6 +48,9 @@ int main(int argc, char *argv[]) {
     auto heightOption = app.add_option("--max-height", params.maxImageHeight,
                                        "The max image height. Any images larger than this will be scaled to this height");
 
+    app.add_flag("--print-path", params.printFilePath,
+                 "Write file path to stdout instead of copying it's contents to the clipboard.");
+
     heightOption->needs(widthOption);
     widthOption->needs(heightOption);
 

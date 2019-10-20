@@ -12,6 +12,7 @@ void ConfigManager::loadConfig() {
             .setRows(cliParams.rows.has_value() ? cliParams.rows.value() : 0)
             .setMaxImageHeight(cliParams.maxImageHeight.has_value() ? cliParams.maxImageHeight.value() : 0)
             .setMaxImageWidth(cliParams.maxImageWidth.has_value() ? cliParams.maxImageWidth.value() : 0)
+            .setPrintFilePath(cliParams.printFilePath)
             .build();
 }
 

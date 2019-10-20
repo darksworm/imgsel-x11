@@ -16,6 +16,8 @@ private:
     unsigned int rows = 0;
     unsigned int cols = 0;
 
+    bool printFilePath = false;
+
     Config() = default;
 
 public:
@@ -45,5 +47,9 @@ public:
 
     unsigned int getCols() const {
         return cols;
+    }
+
+    bool shouldPrintFilePath() const {
+        return printFilePath;
     }
 };

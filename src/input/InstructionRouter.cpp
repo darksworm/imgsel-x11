@@ -1,5 +1,6 @@
 #include <memory>
 #include <thread>
+#include <iostream>
 #include "../gui/WindowManager.h"
 #include "../util/ThreadSafeQueue.h"
 #include "XEventWrapper.h"
@@ -55,7 +56,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         }
 
         if (event.eventType == ConfigureNotify || event.eventType == Expose) {
-            if(initialFrameDrawn && event.eventType == ConfigureNotify) {
+            if (initialFrameDrawn && event.eventType == ConfigureNotify) {
                 continue;
             }
 
@@ -128,7 +129,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         } else if (dynamic_cast<FilterInstruction *>(instruction.get())) {
             auto filterInstruction = ((FilterInstruction *) instruction.get());
 
-            if(!filterInstruction->getFilterString().empty()) {
+            if (!filterInstruction->getFilterString().empty()) {
                 itemPickerDrawer->setFilter(filterInstruction->getFilter(), filterInstruction->getFilterString());
             } else {
                 itemPickerDrawer->clearFilter();
@@ -137,13 +138,18 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         } else if (dynamic_cast<CopyInstruction *>(instruction.get())) {
             auto selectedImage = itemPickerDrawer->getSelectedImage();
             auto path = selectedImage->getPath();
-            auto ext = selectedImage->getExtension();
 
-            ext = ext == "jpg" ? "jpeg" : ext;
+            if (config.shouldPrintFilePath()) {
+                std::cout << path;
+            } else {
+                auto ext = selectedImage->getExtension();
+                ext = ext == "jpg" ? "jpeg" : ext;
 
-            // TODO: handle 's in filenames
-            std::string command = "cat '" + path + "' | xclip -selection clipboard -target image/" + ext + " -i";
-            system(command.c_str());
+                // TODO: handle 's in filenames
+                std::string command = "cat '" + path + "' | xclip -selection clipboard -target image/" + ext + " -i";
+                system(command.c_str());
+            }
+
             keep_running = false;
         }
 
@@ -153,7 +159,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             drawText(windowManager, "QUERY: " + itemPickerDrawer->getFilterString(), Dimensions(500, 100));
         } else {
             // this should clear the previous query
-            drawText(windowManager, "", Dimensions(500,100));
+            drawText(windowManager, "", Dimensions(500, 100));
         }
     }
 
