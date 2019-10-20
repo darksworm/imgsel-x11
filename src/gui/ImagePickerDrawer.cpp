@@ -4,6 +4,7 @@
 #include "../exceptions/OutOfBounds.h"
 #include "dimensions.h"
 #include "../exceptions/ImageNotLoadable.h"
+#include "../lib/spdlog/include/spdlog/spdlog.h"
 #include <memory>
 
 ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager, std::vector<Image> *images) {
@@ -84,7 +85,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
                 shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
             } catch (ImageNotLoadable &e) {
                 images->erase(it);
-                if(--it < start) {
+                if (--it < start) {
                     break;
                 } else {
                     continue;
@@ -134,7 +135,7 @@ std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
 
 void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
     if (filter.has_value() && images->size() < (long) targetIndex + 1) {
-        std::cout << "Loading page...\n";
+        spdlog::debug("Loading page...");
         unsigned int offset = 0;
 
         if (lastPreloadedImageIndex) {
@@ -176,7 +177,7 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
     bool canMove = false;
     long newSelectedShapeIdx = 0;
 
-    char *debug;
+    char *debug = "NONE";
 
     switch (move) {
         case ImagePickerMove::LEFT:
@@ -192,7 +193,7 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             break;
         case ImagePickerMove::UP:
             canMove = selectedShape->index - (steps * shapeProperties.itemCounts.x) >= 0;
-            if(canMove) {
+            if (canMove) {
                 newSelectedShapeIdx = selectedShape->index - (steps * shapeProperties.itemCounts.x);
             } else {
                 newSelectedShapeIdx = selectedShape->index % shapeProperties.itemCounts.x;
@@ -203,10 +204,11 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
         case ImagePickerMove::DOWN:
             preloadToIndex(selectedShape->index + (steps * shapeProperties.itemCounts.x));
             canMove = selectedShape->index + (steps * shapeProperties.itemCounts.x) < images->size();
-            if(canMove) {
+            if (canMove) {
                 newSelectedShapeIdx = selectedShape->index + (steps * shapeProperties.itemCounts.x);
             } else {
-                newSelectedShapeIdx = ((images->size() / shapeProperties.itemCounts.x) * shapeProperties.itemCounts.x) + selectedShape->index % shapeProperties.itemCounts.x;
+                newSelectedShapeIdx = ((images->size() / shapeProperties.itemCounts.x) * shapeProperties.itemCounts.x) +
+                                      selectedShape->index % shapeProperties.itemCounts.x;
                 newSelectedShapeIdx = newSelectedShapeIdx >= images->size() ? images->size() - 1 : newSelectedShapeIdx;
                 canMove = true;
             }
@@ -226,7 +228,7 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
         case ImagePickerMove::LINE:
             preloadToIndex(steps > 0 && shapeProperties.itemCounts.x * steps);
             canMove = steps > 0 && shapeProperties.itemCounts.x * steps < images->size();
-            if(canMove) {
+            if (canMove) {
                 newSelectedShapeIdx = shapeProperties.itemCounts.x * (steps - 1);
             } else {
                 canMove = true;
@@ -252,8 +254,8 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             break;
     }
 
-    printf("type: %s, canmove: %d oldIdx: %d newIdx: %d \n", debug, canMove, selectedShape->index,
-           (int) newSelectedShapeIdx);
+    spdlog::debug("type: {}, canmove: {} oldIdx: {} newIdx: {}", debug, canMove, selectedShape->index,
+                  (int) newSelectedShapeIdx);
 
     if (canMove) {
         goToImage(newSelectedShapeIdx);
