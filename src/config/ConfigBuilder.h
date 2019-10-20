@@ -48,4 +48,9 @@ public:
         config->cols = cols;
         return *this;
     }
+
+    ConfigBuilder& setPrintFilePath(bool printFilePath) {
+        config->printFilePath = printFilePath;
+        return *this;
+    }
 };
