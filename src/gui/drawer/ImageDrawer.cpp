@@ -67,7 +67,7 @@ ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     ShapeProperties shapeProperties{
             .dimensions = Dimensions(300, 150),
             .margins = Dimensions(20, 20),
-            .itemCounts = Dimensions(config.getRows() > 0 ? config.getRows() : 4, config.getCols() > 0 ? config.getCols() : 4),
+            .itemCounts = Dimensions(config.getCols() > 0 ? config.getCols() : 4, config.getRows() > 0 ? config.getRows() : 4),
             .topTextRect = XRectangle{
                     .x = 10,
                     .y = 20,
