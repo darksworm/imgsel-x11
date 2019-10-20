@@ -95,35 +95,33 @@ XPoint *ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimen
     XPoint *lastShapePosition = this->lastShapePosition;
     XPoint *newShapePosition;
 
-    unsigned int xCenterMargin, yCenterMargin;
+    unsigned int xMargin, yMargin;
 
-    unsigned int line_width = shapeProperties.dimensions.x * shapeProperties.itemCounts.x +
-                              (shapeProperties.margins.x * shapeProperties.itemCounts.x - 1);
-    unsigned int line_height = shapeProperties.dimensions.y * shapeProperties.itemCounts.y +
-                               (shapeProperties.margins.y * shapeProperties.itemCounts.y - 1);
+    unsigned int oneRowWidth = shapeProperties.dimensions.x * shapeProperties.itemCounts.x +
+                               (shapeProperties.margins.x * shapeProperties.itemCounts.x - 1);
+    unsigned int oneColumnHeight = shapeProperties.dimensions.y * shapeProperties.itemCounts.y +
+                                   (shapeProperties.margins.y * shapeProperties.itemCounts.y - 1);
 
-    xCenterMargin = (windowDimensions.x - line_width) / 2;
-    yCenterMargin = (windowDimensions.y - line_height) / 2;
+    xMargin = (windowDimensions.x - oneRowWidth) / 2;
+    yMargin = (windowDimensions.y - oneColumnHeight) / 2;
 
     if (!lastShapePosition) {
         newShapePosition = new XPoint{
-                .x = (short) xCenterMargin,
-                .y = (short) yCenterMargin
+                .x = (short) xMargin,
+                .y = (short) yMargin
         };
     } else {
         XPoint offset;
 
-        if (lastShapePosition->x >= shapeProperties.dimensions.x * (shapeProperties.itemCounts.x - 1) + xCenterMargin) {
+        if (lastShapePosition->x >= shapeProperties.dimensions.x * (shapeProperties.itemCounts.x - 1) + xMargin) {
             // move to next line
-            offset.y = (short) (shapeProperties.dimensions.y + shapeProperties.margins.y + lastShapePosition->y +
-                                shapeProperties.margins.y);
-            offset.x = (short) xCenterMargin;
+            offset.y = (short) (shapeProperties.dimensions.y + shapeProperties.margins.y + lastShapePosition->y);
+            offset.x = (short) xMargin;
         } else {
             offset.x = (short) (lastShapePosition->x + shapeProperties.dimensions.x + shapeProperties.margins.x);
             offset.y = (short) (lastShapePosition->y);
         }
 
-        // TODO: this is temporary positioning
         newShapePosition = new XPoint{
                 .x = (short) (offset.x),
                 .y = (short) (offset.y)
