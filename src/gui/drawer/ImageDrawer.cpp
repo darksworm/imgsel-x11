@@ -66,7 +66,7 @@ ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     // TODO: calculate missing props dynamically
     ShapeProperties shapeProperties{
             .dimensions = Dimensions(300, 150),
-            .margins = Dimensions(20, 20),
+            .margins = Dimensions(20, 40),
             .itemCounts = Dimensions(config.getCols() > 0 ? config.getCols() : 4, config.getRows() > 0 ? config.getRows() : 4),
             .topTextRect = XRectangle{
                     .x = 10,
