@@ -9,6 +9,7 @@ Shape ImageDrawer::calcNextShape(ShapeProperties properties, Image *hotkey, bool
 }
 
 Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions windowDimensions, Shape shape) {
+    auto config = ConfigManager::getOrLoadConfig();
     Imlib_Image img;
     Pixmap pix;
     int width, height;
@@ -23,6 +24,30 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     imlib_context_set_image(img);
     width = imlib_image_get_width();
     height = imlib_image_get_height();
+
+    if (config.getMaxImageHeight() + config.getMaxImageWidth() > 0) {
+        if (config.getMaxImageWidth() > 0 && width > config.getMaxImageWidth()) {
+            auto scale = (double)config.getMaxImageWidth() / width;
+            int new_height = height * scale;
+            img = imlib_create_cropped_scaled_image(0, 0, width, height, config.getMaxImageWidth(), new_height);
+            imlib_free_image();
+            imlib_context_set_image(img);
+
+            width = config.getMaxImageWidth();
+            height = new_height;
+        }
+
+        if (config.getMaxImageHeight() > 0 && height > config.getMaxImageHeight()) {
+            auto scale = (double)config.getMaxImageHeight() / height;
+            int new_width = width * scale;
+            img = imlib_create_cropped_scaled_image(0, 0, width, height, new_width, config.getMaxImageHeight());
+            imlib_free_image();
+            imlib_context_set_image(img);
+
+            width = new_width;
+            height = config.getMaxImageHeight();
+        }
+    }
 
     pix = XCreatePixmap(windowManager->getDisplay(), windowManager->getWindow(), width, height,
                         windowManager->getDepth());
@@ -67,7 +92,8 @@ ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     ShapeProperties shapeProperties{
             .dimensions = Dimensions(300, 150),
             .margins = Dimensions(20, 40),
-            .itemCounts = Dimensions(config.getCols() > 0 ? config.getCols() : 4, config.getRows() > 0 ? config.getRows() : 4),
+            .itemCounts = Dimensions(config.getCols() > 0 ? config.getCols() : 4,
+                                     config.getRows() > 0 ? config.getRows() : 4),
             .topTextRect = XRectangle{
                     .x = 10,
                     .y = 20,

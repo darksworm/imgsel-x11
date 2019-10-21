@@ -35,7 +35,7 @@ public:
     }
 
     ConfigBuilder& setMaxImageWidth(unsigned int maxImageWidth) {
-        config->maxImageHeight = maxImageWidth;
+        config->maxImageWidth = maxImageWidth;
         return *this;
     }
 
