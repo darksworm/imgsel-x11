@@ -20,9 +20,18 @@
 #include "util/helpers.h"
 
 int main(int argc, char *argv[]) {
+    auto homeDir = getHomeDir();
+
+    struct stat info;
+    if (stat((homeDir + "/.imgsel/logs").c_str(), &info) != 0) {
+        mkdir((homeDir + "/.imgsel").c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+        mkdir((homeDir + "/.imgsel/logs").c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+    }
+
     spdlog::set_level(spdlog::level::debug);
     spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
-    auto file_logger = spdlog::rotating_logger_mt("basic_logger", "log.txt", 1024 * 1024 * 5, 3);
+
+    auto file_logger = spdlog::rotating_logger_mt("basic_logger", homeDir + "/.imgsel/logs/log.txt", 1024 * 1024 * 5, 3);
     spdlog::set_default_logger(file_logger);
 
     if (!XInitThreads()) {
