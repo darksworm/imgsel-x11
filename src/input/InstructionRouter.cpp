@@ -1,6 +1,7 @@
 #include <memory>
 #include <thread>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include "../gui/WindowManager.h"
 #include "../util/ThreadSafeQueue.h"
 #include "XEventWrapper.h"
@@ -78,7 +79,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             keyCode = x11_keycode_to_libinput_code(event.keySym);
         }
 
-        printf("RAW: %s FORMATTED: %s %u\n", keycode_linux_rawname(keyCode),
+        spdlog::debug("RAW: {} FORMATTED: {} {}", keycode_linux_rawname(keyCode),
                keycode_linux_name(keycode_linux_to_hid(keyCode)), keyCode);
 
         std::unique_ptr<Instruction> instruction;

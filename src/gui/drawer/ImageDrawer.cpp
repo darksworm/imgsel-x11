@@ -1,4 +1,5 @@
 #include <Imlib2.h>
+#include <spdlog/spdlog.h>
 #include "ImageDrawer.h"
 #include "../../exceptions/ImageNotLoadable.h"
 #include "../../config/ConfigManager.h"
@@ -17,7 +18,7 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     img = imlib_load_image(shape.image->getPath().c_str());
 
     if (!img) {
-        fprintf(stderr, "%s:Unable to load image\n", shape.image->getPath().c_str());
+        spdlog::error("Unable to load image {}", shape.image->getPath().c_str());
         throw ImageNotLoadable();
     }
 
