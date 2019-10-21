@@ -1,6 +1,6 @@
-#include <iostream>
 #include <thread>
 #include "lib/CLI11/include/CLI/CLI.hpp"
+#include "lib/spdlog/include/spdlog/spdlog.h"
 
 #include <X11/extensions/XTest.h>
 #include <Imlib2.h>
@@ -14,13 +14,28 @@
 
 #include <vector>
 #include <string>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include "input/InstructionRouter.h"
 #include "input/XInputHandler.h"
 #include "util/helpers.h"
 
 int main(int argc, char *argv[]) {
+    auto homeDir = getHomeDir();
+
+    struct stat info;
+    if (stat((homeDir + "/.imgsel/logs").c_str(), &info) != 0) {
+        mkdir((homeDir + "/.imgsel").c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+        mkdir((homeDir + "/.imgsel/logs").c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+    }
+
+    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
+
+    auto file_logger = spdlog::rotating_logger_mt("basic_logger", homeDir + "/.imgsel/logs/log.txt", 1024 * 1024 * 5, 3);
+    spdlog::set_default_logger(file_logger);
+
     if (!XInitThreads()) {
-        std::cout << "Failed to initialize XLib threads!";
+        spdlog::critical("Failed to initialize XLib threads!");
         exit(1);
     }
 

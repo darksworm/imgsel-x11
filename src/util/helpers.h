@@ -10,6 +10,8 @@
 
 void drawText(WindowManager *windowManager, const std::string &text, Dimensions position);
 
+std::string getHomeDir();
+
 struct CLIParams {
     unsigned int cacheSize;
     std::vector<std::string> imageFiles;

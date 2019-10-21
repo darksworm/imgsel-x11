@@ -1,4 +1,6 @@
 #include "helpers.h"
+#include <unistd.h>
+#include <pwd.h>
 
 void drawText(WindowManager *windowManager, const std::string &text, Dimensions position) {
     XClearArea(
@@ -35,3 +37,8 @@ void drawText(WindowManager *windowManager, const std::string &text, Dimensions 
     XFreeGC(display, gc);
 }
 
+std::string getHomeDir() {
+    std::string homedir = getpwuid(getuid())->pw_dir;
+
+    return homedir;
+}
