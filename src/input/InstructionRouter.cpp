@@ -80,7 +80,7 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
         }
 
         spdlog::debug("RAW: {} FORMATTED: {} {}", keycode_linux_rawname(keyCode),
-               keycode_linux_name(keycode_linux_to_hid(keyCode)), keyCode);
+                      keycode_linux_name(keycode_linux_to_hid(keyCode)), keyCode);
 
         std::unique_ptr<Instruction> instruction;
 
@@ -156,11 +156,21 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
 
         drawText(windowManager, state == InputMode::DEFAULT ? "DEFAULT" : "VIM", Dimensions(10, height - 10));
 
+        XClearArea(
+            windowManager->getDisplay(),
+            windowManager->getWindow(),
+            0,
+            0,
+            width,
+            40,
+            false
+        );
+
         if (!itemPickerDrawer->getFilterString().empty()) {
-            drawText(windowManager, "QUERY: " + itemPickerDrawer->getFilterString(), Dimensions(500, 100));
+            drawCenteredText(windowManager, itemPickerDrawer->getFilterString(), Dimensions(width / 2, 20));
         } else {
             // this should clear the previous query
-            drawText(windowManager, "", Dimensions(500, 100));
+            drawCenteredText(windowManager, "", Dimensions(500, 100));
         }
     }
 
