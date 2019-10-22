@@ -7,6 +7,7 @@ class Image {
 private:
     std::string path = "";
     std::string filename = "";
+    std::string filenameWithoutExtension = "";
     std::string extension = "";
 public:
     Image(std::string path) : path(std::move(path)) {
@@ -27,6 +28,12 @@ public:
         } else {
             filename = this->path;
         }
+
+        lastDotPos = filename.find_last_of('.');
+
+        if(lastDotPos != std::string::npos) {
+            filenameWithoutExtension = filename.substr(0, lastDotPos);
+        }
     }
 
     std::string getPath() { return path; }
@@ -37,6 +44,10 @@ public:
 
     std::string getExtension() {
         return extension;
+    }
+
+    std::string getFilenameWithoutExtension() {
+        return filenameWithoutExtension;
     }
 
     bool operator==(Image& other) {

@@ -73,14 +73,29 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     imlib_free_image();
     XFreePixmap(windowManager->getDisplay(), pix);
 
+    auto font = XLoadQueryFont(windowManager->getDisplay(), "fixed");
+    XSetFont(windowManager->getDisplay(), textGC, font->fid);
+
+    auto displayName = shape.image->getFilenameWithoutExtension();
+    unsigned int textWidth = 0;
+    auto maxTextWidth = shapeProperties.dimensions.x - 20;
+
+    do {
+        textWidth = XTextWidth(font, displayName.c_str(), displayName.length());
+
+        if(textWidth >= maxTextWidth) {
+            displayName = displayName.substr(0, displayName.length() - 1);
+        }
+    } while (textWidth >= maxTextWidth);
+
     XDrawString(
             windowManager->getDisplay(),
             windowManager->getWindow(),
             textGC,
-            shape.position.x + shapeProperties.botTextRect.x,
+            shape.position.x + shapeProperties.dimensions.x / 2 - textWidth / 2,
             shape.position.y + shapeProperties.botTextRect.y,
-            shape.image->getFilename().c_str(),
-            (int) shape.image->getFilename().length()
+            displayName.c_str(),
+            (int) displayName.length()
     );
 
     return shape;
