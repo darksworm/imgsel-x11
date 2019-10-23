@@ -162,15 +162,12 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             0,
             0,
             width,
-            40,
+            60,
             false
         );
 
         if (!itemPickerDrawer->getFilterString().empty()) {
-            drawCenteredText(windowManager, itemPickerDrawer->getFilterString(), Dimensions(width / 2, 20));
-        } else {
-            // this should clear the previous query
-            drawCenteredText(windowManager, "", Dimensions(500, 100));
+            drawCenteredText(windowManager, itemPickerDrawer->getFilterString(), Dimensions(width / 2, 30));
         }
     }
 
