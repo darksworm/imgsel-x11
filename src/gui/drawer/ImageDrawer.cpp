@@ -93,7 +93,7 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
             windowManager->getWindow(),
             textGC,
             shape.position.x + shapeProperties.dimensions.x / 2 - textWidth / 2,
-            shape.position.y + shapeProperties.botTextRect.y,
+            shape.position.y + shapeProperties.nameRect.y,
             displayName.c_str(),
             (int) displayName.length()
     );
@@ -104,29 +104,13 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
 ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     auto config = ConfigManager::getOrLoadConfig();
 
-    // TODO: calculate missing props dynamically
     ShapeProperties shapeProperties{
-            .dimensions = Dimensions(300, 150),
-            .margins = Dimensions(20, 40),
+            .dimensions = Dimensions(config.getMaxImageWidth() + config.getXPadding() * 2,  config.getMaxImageHeight() + config.getYPadding() * 2),
+            .margins = Dimensions(config.getXMargin(), config.getYMargin()),
             .itemCounts = Dimensions(config.getCols() > 0 ? config.getCols() : 4,
                                      config.getRows() > 0 ? config.getRows() : 4),
-            .topTextRect = XRectangle{
-                    .x = 10,
-                    .y = 20,
-                    .width = (unsigned short) (shapeProperties.dimensions.x - 10),
-                    .height = 40
-            },
-            .midTextRect = XRectangle{
-                    .x = shapeProperties.topTextRect.x,
-                    .y = (short) (shapeProperties.dimensions.y - 80),
-                    .width = shapeProperties.topTextRect.width,
-                    .height = shapeProperties.topTextRect.height
-            },
-            .botTextRect = XRectangle{
-                    .x = shapeProperties.topTextRect.x,
-                    .y = (short) (shapeProperties.dimensions.y - 40),
-                    .width = shapeProperties.topTextRect.width,
-                    .height = shapeProperties.topTextRect.height
+            .nameRect = XRectangle{
+                    .y = static_cast<short>(config.getMaxImageHeight() + config.getYPadding() * 1.5)
             }
     };
 
@@ -155,7 +139,7 @@ XPoint *ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimen
     } else {
         XPoint offset;
 
-        if (lastShapePosition->x >= shapeProperties.dimensions.x * (shapeProperties.itemCounts.x - 1) + xMargin) {
+        if (lastShapePosition->x + shapeProperties.margins.x + shapeProperties.dimensions.x > oneRowWidth + xMargin) {
             // move to next line
             offset.y = (short) (shapeProperties.dimensions.y + shapeProperties.margins.y + lastShapePosition->y);
             offset.x = (short) xMargin;

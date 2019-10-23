@@ -53,4 +53,24 @@ public:
         config->printFilePath = printFilePath;
         return *this;
     }
+
+    ConfigBuilder& setYMargin(unsigned int yMargin) {
+        config->yMargin = yMargin;
+        return *this;
+    }
+
+    ConfigBuilder& setXMargin(unsigned int xMargin) {
+        config->xMargin = xMargin;
+        return *this;
+    }
+
+    ConfigBuilder& setYPadding(unsigned int yPadding) {
+        config->yPadding = yPadding;
+        return *this;
+    }
+
+    ConfigBuilder& setXPadding(unsigned int xPadding) {
+        config->xPadding = xPadding;
+        return *this;
+    }
 };

@@ -9,9 +9,7 @@ struct ShapeProperties {
     Dimensions margins;
     Dimensions itemCounts;
 
-    XRectangle topTextRect;
-    XRectangle midTextRect;
-    XRectangle botTextRect;
+    XRectangle nameRect;
 };
 
 struct Shape {

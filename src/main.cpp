@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     auto rowCountOption = app.add_option("--rows", params.rows, "How many rows to display");
     auto colCountOption = app.add_option("--cols", params.cols, "How many cols to display");
 
-    rowCountOption->needs(colCountOption);
+    rowCountOption->needs(colCountOption)->required();
     colCountOption->needs(rowCountOption);
 
     auto widthOption = app.add_option("--max-width", params.maxImageWidth,
@@ -63,10 +63,22 @@ int main(int argc, char *argv[]) {
     auto heightOption = app.add_option("--max-height", params.maxImageHeight,
                                        "The max image height. Any images larger than this will be scaled to this height");
 
+    auto xPadding = app.add_option("--x-padding", params.imageXPadding, "Padding between image and selection box in pixels on the x axis");
+    auto yPadding = app.add_option("--y-padding", params.imageYPadding, "Padding between image and selection box in pixels on the y axis");
+
+    xPadding->needs(yPadding);
+    yPadding->needs(xPadding);
+
+    auto xMargin = app.add_option("--x-margin", params.imageXMargin, "Margin between images in pixels on the x axis");
+    auto yMargin = app.add_option("--y-margin", params.imageYMargin, "Margin between images in pixels on the y axis");
+
+    xMargin->needs(yMargin);
+    yMargin->needs(xMargin);
+
     app.add_flag("--print-path", params.printFilePath,
                  "Write file path to stdout instead of copying it's contents to the clipboard.");
 
-    heightOption->needs(widthOption);
+    heightOption->needs(widthOption)->required();
     widthOption->needs(heightOption);
 
     CLI11_PARSE(app, argc, argv);

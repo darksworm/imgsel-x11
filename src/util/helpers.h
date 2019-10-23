@@ -26,4 +26,10 @@ struct CLIParams {
     std::optional<unsigned int> cols;
 
     bool printFilePath = false;
+
+    std::optional<unsigned int> imageXMargin;
+    std::optional<unsigned int> imageYMargin;
+
+    std::optional<unsigned int> imageXPadding;
+    std::optional<unsigned int> imageYPadding;
 };

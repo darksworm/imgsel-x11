@@ -18,6 +18,12 @@ private:
 
     bool printFilePath = false;
 
+    unsigned int yPadding = 40;
+    unsigned int xPadding = 40;
+
+    unsigned int xMargin = 40;
+    unsigned int yMargin = 20;
+
     Config() = default;
 
 public:
@@ -51,5 +57,21 @@ public:
 
     bool shouldPrintFilePath() const {
         return printFilePath;
+    }
+
+    unsigned int getYPadding() const {
+        return yPadding;
+    }
+
+    unsigned int getXPadding() const {
+        return xPadding;
+    }
+
+    unsigned int getYMargin() const {
+        return yMargin;
+    }
+
+    unsigned int getXMargin() const {
+        return xMargin;
     }
 };
