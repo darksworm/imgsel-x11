@@ -15,11 +15,19 @@
 #include <vector>
 #include <string>
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <sys/file.h>
 #include "input/InstructionRouter.h"
 #include "input/XInputHandler.h"
 #include "util/helpers.h"
 
 int main(int argc, char *argv[]) {
+    int pid_file = open("/tmp/imgsel.pid", O_CREAT | O_RDWR, 0666);
+    int rc = flock(pid_file, LOCK_EX | LOCK_NB);
+    if (rc && EWOULDBLOCK == errno) {
+        std::cout << "another proccess is already running!";
+        exit(1);
+    }
+
     auto homeDir = getHomeDir();
 
     struct stat info;
