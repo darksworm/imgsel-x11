@@ -128,8 +128,10 @@ Dimensions WindowManager::getScreenDimensions() {
         auto screenInfo = XineramaQueryScreens(display, &num);
 
         for (auto current = screenInfo; current <= screenInfo + num - 1; ++current) {
-            if (current->x_org <= root_x && current->width >= root_x && current->y_org <= root_y &&
-                current->height >= root_y) {
+            if (current->x_org <= root_x &&
+                current->width + current->x_org >= root_x &&
+                current->y_org <= root_y &&
+                current->height + current->y_org >= root_y) {
                 dim.x = current->width;
                 dim.y = current->height;
                 break;
