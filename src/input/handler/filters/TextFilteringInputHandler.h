@@ -11,7 +11,7 @@ public:
 
     InputMode getNextMode() override;
 
-    Instruction *handleKeyPress(unsigned keyPress) override;
+    InputInstruction *handleKeyPress(unsigned keyPress) override;
 
 protected:
     bool shouldAddToBuffer(unsigned keyPress) override;

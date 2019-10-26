@@ -2,9 +2,7 @@
 
 #include "ImagePickerDrawer.h"
 #include "../exceptions/OutOfBounds.h"
-#include "dimensions.h"
 #include "../exceptions/ImageNotLoadable.h"
-#include "../lib/spdlog/include/spdlog/spdlog.h"
 #include <memory>
 
 ImagePickerDrawer::ImagePickerDrawer(WindowManager *windowManager, std::vector<Image> *images) {
@@ -135,7 +133,7 @@ std::vector<Image>::iterator ImagePickerDrawer::getPageImageStart() {
 
 void ImagePickerDrawer::preloadToIndex(unsigned int targetIndex) {
     if (filter.has_value() && images->size() < (long) targetIndex + 1) {
-        spdlog::debug("Loading page...");
+        //spdlog::debug("Loading page...");
         unsigned int offset = 0;
 
         if (lastPreloadedImageIndex) {
@@ -254,8 +252,6 @@ bool ImagePickerDrawer::move(ImagePickerMove move, unsigned int steps) {
             break;
     }
 
-    spdlog::debug("type: {}, canmove: {} oldIdx: {} newIdx: {}", debug, canMove, selectedShape->index,
-                  (int) newSelectedShapeIdx);
 
     if (canMove) {
         goToImage(newSelectedShapeIdx);

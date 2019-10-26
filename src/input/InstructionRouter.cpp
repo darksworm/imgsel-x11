@@ -8,7 +8,6 @@
 #include "../image/image.h"
 #include "../gui/ImagePickerDrawer.h"
 #include "handler/InputHandler.h"
-#include "../lib/keycode/keycode.h"
 #include "x11_keycodes.h"
 #include "handler/InputHandlerFactory.h"
 #include "handler/instruction/ModeChangeInstruction.h"
@@ -79,30 +78,30 @@ void handleEvents(WindowManager *windowManager, ThreadSafeQueue<XEventWrapper> *
             keyCode = x11_keycode_to_libinput_code(event.keySym);
         }
 
-        spdlog::debug("RAW: {} FORMATTED: {} {}", keycode_linux_rawname(keyCode),
-                      keycode_linux_name(keycode_linux_to_hid(keyCode)), keyCode);
+        //spdlog::debug("RAW: {} FORMATTED: {} {}", keycode_linux_rawname(keyCode),
+                      //keycode_linux_name(keycode_linux_to_hid(keyCode)), keyCode);
 
-        std::unique_ptr<Instruction> instruction;
+        std::unique_ptr<InputInstruction> instruction;
 
         if (event.eventType == KeyPress) {
-            instruction = std::unique_ptr<Instruction>(inputHandler->handleKeyPress(keyCode));
+            instruction = std::unique_ptr<InputInstruction>(inputHandler->handleKeyPress(keyCode));
         } else if (event.eventType == KeyRelease) {
-            instruction = std::unique_ptr<Instruction>(inputHandler->handleKeyRelease(keyCode));
+            instruction = std::unique_ptr<InputInstruction>(inputHandler->handleKeyRelease(keyCode));
         } else continue;
 
-        if (instruction->getType() == InstructionType::NONE) {
+        if (instruction->getType() == InputInstructionType::NONE) {
             continue;
         }
 
         bool shouldExit =
-                itemPickerDrawer->getFilterString().empty() && instruction->getType() == InstructionType::CANCEL;
+                itemPickerDrawer->getFilterString().empty() && instruction->getType() == InputInstructionType::CANCEL;
 
-        if (shouldExit || instruction->getType() == InstructionType::EXIT) {
+        if (shouldExit || instruction->getType() == InputInstructionType::EXIT) {
             keep_running = false;
             continue;
         }
 
-        if (instruction->getType() == InstructionType::CANCEL) {
+        if (instruction->getType() == InputInstructionType::CANCEL) {
             itemPickerDrawer->clearFilter();
             itemPickerDrawer->drawFrame(nullptr);
         } else if (dynamic_cast<MoveInstruction *>(instruction.get())) {

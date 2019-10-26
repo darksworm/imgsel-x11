@@ -1,8 +1,8 @@
 #pragma once
-#include "Instruction.h"
+#include "InputInstruction.h"
 #include "../../../gui/ImagePickerDrawer.h"
 
-class MoveInstruction : public Instruction {
+class MoveInstruction : public InputInstruction {
 private:
     ImagePickerMove moveDirection;
     unsigned int moveSteps = 1;
@@ -11,8 +11,8 @@ public:
         return this->moveDirection;
     }
 
-    explicit MoveInstruction(ImagePickerMove moveDirection, unsigned int moveSteps) : Instruction(InstructionType::MOVE),
-                                                                    moveDirection(moveDirection), moveSteps(moveSteps) {}
+    explicit MoveInstruction(ImagePickerMove moveDirection, unsigned int moveSteps) : InputInstruction(InputInstructionType::MOVE),
+                                                                                      moveDirection(moveDirection), moveSteps(moveSteps) {}
 
     unsigned int getMoveSteps() const {
         return moveSteps;

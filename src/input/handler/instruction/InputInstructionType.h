@@ -1,6 +1,6 @@
 #pragma once
 
-enum class InstructionType {
+enum class InputInstructionType {
     NONE,
     EXIT,
     CHANGE_MODE,

@@ -2,9 +2,9 @@
 
 
 #include "../InputMode.h"
-#include "Instruction.h"
+#include "InputInstruction.h"
 
-class ModeChangeInstruction : public Instruction {
+class ModeChangeInstruction : public InputInstruction {
 public:
     const InputMode newMode;
     const bool shouldClearFilters;
@@ -12,7 +12,7 @@ public:
     const bool sendBuffer;
 
     explicit ModeChangeInstruction(InputMode newMode, unsigned bufferedKeypress = 0, bool sendBuffer = false, bool shouldClearFilters = false)
-            : Instruction(InstructionType::CHANGE_MODE), newMode(newMode), bufferedKeyPress(bufferedKeypress),
+            : InputInstruction(InputInstructionType::CHANGE_MODE), newMode(newMode), bufferedKeyPress(bufferedKeypress),
               sendBuffer(sendBuffer), shouldClearFilters(shouldClearFilters) {};
 };
 

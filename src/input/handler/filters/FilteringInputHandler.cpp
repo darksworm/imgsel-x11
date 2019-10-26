@@ -2,11 +2,11 @@
 #include "../instruction/FilterInstruction.h"
 #include "../instruction/ModeChangeInstruction.h"
 
-Instruction *FilteringInputHandler::handleKeyPress(unsigned keyPress) {
+InputInstruction *FilteringInputHandler::handleKeyPress(unsigned keyPress) {
     auto instruction = InputHandler::handleKeyPress(keyPress);
 
     switch (instruction->getType()) {
-        case InstructionType::CANCEL: {
+        case InputInstructionType::CANCEL: {
             if (!this->buffer.empty()) {
                 this->buffer.clear();
 
@@ -17,7 +17,7 @@ Instruction *FilteringInputHandler::handleKeyPress(unsigned keyPress) {
             break;
         }
 
-        case InstructionType::NONE: {
+        case InputInstructionType::NONE: {
             if (shouldAddToBuffer(keyPress)) {
                 this->buffer.push_back(keyPress);
 

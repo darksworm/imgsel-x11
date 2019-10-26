@@ -6,15 +6,15 @@
 #include "instruction/MoveInstruction.h"
 #include "instruction/ModeChangeInstruction.h"
 
-Instruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
+InputInstruction *SelectionInputHandler::handleKeyPress(unsigned keyCode) {
     auto instruction = InputHandler::handleKeyPress(keyCode);
 
     if (keyCode == KEY_Q) {
-        instruction = new Instruction(InstructionType::EXIT);
+        instruction = new InputInstruction(InputInstructionType::EXIT);
         return instruction;
     }
 
-    if (instruction->getType() == InstructionType::NONE) {
+    if (instruction->getType() == InputInstructionType::NONE) {
         ImagePickerMove move = ImagePickerMove::NONE;
 
         switch (keyCode) {

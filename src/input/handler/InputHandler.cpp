@@ -6,9 +6,9 @@
 #include "../../gui/ImagePickerDrawer.h"
 #include "instruction/MoveInstruction.h"
 
-Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
+InputInstruction *InputHandler::handleKeyPress(unsigned keyCode) {
     if (keyCode == KEY_ESC) {
-        return new Instruction(InstructionType::CANCEL);
+        return new InputInstruction(InputInstructionType::CANCEL);
     }
 
     if (keyCode == KEY_CAPSLOCK) {
@@ -26,7 +26,7 @@ Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
     }
 
     if (keyCode == KEY_C && isModifierActive("CONTROL")) {
-        return new Instruction(InstructionType::EXIT);
+        return new InputInstruction(InputInstructionType::EXIT);
     }
 
     ImagePickerMove move = ImagePickerMove::NONE;
@@ -65,15 +65,15 @@ Instruction *InputHandler::handleKeyPress(unsigned keyCode) {
         return new MoveInstruction(move, 1);
     }
 
-    return new Instruction(InstructionType::NONE);
+    return new InputInstruction(InputInstructionType::NONE);
 }
 
-Instruction *InputHandler::handleKeyRelease(unsigned keyCode) {
+InputInstruction *InputHandler::handleKeyRelease(unsigned keyCode) {
     if (isModifier(keyCode)) {
         removeModifier(keyCode);
     }
 
-    return new Instruction(InstructionType::NONE);
+    return new InputInstruction(InputInstructionType::NONE);
 }
 
 void InputHandler::removeModifier(unsigned keyCode) {

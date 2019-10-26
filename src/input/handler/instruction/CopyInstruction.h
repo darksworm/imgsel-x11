@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../InputMode.h"
-#include "Instruction.h"
+#include "InputInstruction.h"
 
-class CopyInstruction : public Instruction {
+class CopyInstruction : public InputInstruction {
 private:
 public:
     explicit CopyInstruction()
-            : Instruction(InstructionType::COPY) {};
+            : InputInstruction(InputInstructionType::COPY) {};
 };

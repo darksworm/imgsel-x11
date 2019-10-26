@@ -3,16 +3,16 @@
 #include <utility>
 #include <functional>
 
-#include "Instruction.h"
+#include "InputInstruction.h"
 #include "../../../image/image.h"
 
-class FilterInstruction : public Instruction {
+class FilterInstruction : public InputInstruction {
 private:
     std::function<bool(Image *hotkey)> filterFunc;
     std::string filterString;
 public:
-    explicit FilterInstruction(std::function<bool(Image *hotkey)> filterFunc, std::string filterString) : Instruction(
-            InstructionType::FILTER), filterString(std::move(filterString)) {
+    explicit FilterInstruction(std::function<bool(Image *hotkey)> filterFunc, std::string filterString) : InputInstruction(
+            InputInstructionType::FILTER), filterString(std::move(filterString)) {
         this->filterFunc = std::move(filterFunc);
     }
 

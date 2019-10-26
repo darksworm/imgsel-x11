@@ -41,7 +41,7 @@ std::function<bool(Image *)> TextFilteringInputHandler::getFilter() {
     );
 }
 
-Instruction *TextFilteringInputHandler::handleKeyPress(unsigned keyPress) {
+InputInstruction *TextFilteringInputHandler::handleKeyPress(unsigned keyPress) {
     switch (keyPress) {
         case KEY_BACKSPACE: {
             if (!this->buffer.empty()) {

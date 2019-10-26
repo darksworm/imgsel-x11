@@ -3,13 +3,13 @@
 #include <string>
 #include <set>
 #include "../../image/image.h"
-#include "instruction/Instruction.h"
+#include "instruction/InputInstruction.h"
 #include "InputMode.h"
 
 class InputHandler {
 public:
-    virtual Instruction *handleKeyPress(unsigned keyCode);
-    virtual Instruction *handleKeyRelease(unsigned keyCode);
+    virtual InputInstruction *handleKeyPress(unsigned keyCode);
+    virtual InputInstruction *handleKeyRelease(unsigned keyCode);
     virtual InputMode getNextMode() = 0;
 protected:
     void addModifier(unsigned keyCode);
