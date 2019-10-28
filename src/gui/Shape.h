@@ -10,6 +10,7 @@ struct ShapeProperties {
     Dimensions itemCounts;
 
     XRectangle nameRect;
+    XPoint position;
 };
 
 struct Shape {

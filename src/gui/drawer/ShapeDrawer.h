@@ -4,6 +4,7 @@
 #include "../WindowManager.h"
 #include <climits>
 #include <numeric>
+#include <optional>
 
 class ShapeDrawer {
     friend class ImagePickerDrawer;
@@ -84,7 +85,7 @@ protected:
     unsigned int selectedShapeLineWidth = 2;
 
     WindowManager *windowManager;
-    XPoint *lastShapePosition = nullptr;
+    std::optional<XPoint> lastShapePosition;
 
     virtual Shape calcNextShape(ShapeProperties properties, Image *hotkey, bool selected, long index) = 0;
 
@@ -92,7 +93,7 @@ protected:
 
     virtual ShapeProperties calcShapeProps(Window window) = 0;
 
-    virtual XPoint *getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) = 0;
+    virtual XPoint getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) = 0;
 
     virtual void drawSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) = 0;
 
@@ -108,8 +109,6 @@ public:
     }
 
     ~ShapeDrawer() {
-        delete this->lastShapePosition;
-
         XFreeGC(this->windowManager->getDisplay(), textGC);
         XFreeGC(this->windowManager->getDisplay(), selectedShapeGC);
         XFreeGC(this->windowManager->getDisplay(), shapeGC);

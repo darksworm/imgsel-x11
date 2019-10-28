@@ -58,17 +58,14 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     imlib_context_set_colormap(windowManager->getColorMap());
     imlib_context_set_drawable(windowManager->getWindow());
 
-    XPoint *pos = getNextShapePosition(shapeProperties, windowDimensions);
-
     XPoint imagePos = XPoint();
-    imagePos.x = pos->x + shapeProperties.dimensions.x / 2 - width / 2;
-    imagePos.y = pos->y + shapeProperties.dimensions.y / 2 - height / 2;
+    imagePos.x = shapeProperties.position.x + shapeProperties.dimensions.x / 2 - width / 2;
+    imagePos.y = shapeProperties.position.y + shapeProperties.dimensions.y / 2 - height / 2;
 
     imlib_render_image_on_drawable(imagePos.x, imagePos.y);
 
-    shape.position.x = pos->x;
-    shape.position.y = pos->y;
-    lastShapePosition = pos;
+    lastShapePosition = shapeProperties.position;
+    shape.position = lastShapePosition.value();
 
     imlib_free_image();
     XFreePixmap(windowManager->getDisplay(), pix);
@@ -117,9 +114,9 @@ ShapeProperties ImageDrawer::calcShapeProps(Window window) {
     return shapeProperties;
 }
 
-XPoint *ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) {
-    XPoint *lastShapePosition = this->lastShapePosition;
-    XPoint *newShapePosition;
+XPoint ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) {
+    auto lastShapePosition = this->lastShapePosition;
+    XPoint newShapePosition;
 
     unsigned int xMargin, yMargin;
 
@@ -131,8 +128,8 @@ XPoint *ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimen
     xMargin = (windowDimensions.x - oneRowWidth) / 2;
     yMargin = (windowDimensions.y - oneColumnHeight) / 2;
 
-    if (!lastShapePosition) {
-        newShapePosition = new XPoint{
+    if (!lastShapePosition.has_value()) {
+        newShapePosition = XPoint{
                 .x = (short) xMargin,
                 .y = (short) yMargin
         };
@@ -148,7 +145,7 @@ XPoint *ImageDrawer::getNextShapePosition(ShapeProperties shapeProperties, Dimen
             offset.y = (short) (lastShapePosition->y);
         }
 
-        newShapePosition = new XPoint{
+        newShapePosition = XPoint{
                 .x = (short) (offset.x),
                 .y = (short) (offset.y)
         };

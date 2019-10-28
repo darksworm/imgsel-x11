@@ -23,7 +23,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
     oldShapes.insert(shapes.begin(), shapes.end());
 
     shapes.clear();
-    shapeDrawer->lastShapePosition = nullptr;
+    shapeDrawer->lastShapePosition.reset();
 
     std::unique_ptr<Dimensions> windowDimensions(new Dimensions);
     windowManager->getWindowDimensions(&windowDimensions->x, &windowDimensions->y);
@@ -58,14 +58,14 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
             if (!redrawAll && oldShape.image->getPath() == shape.image->getPath()) {
                 shouldDrawShape = false;
                 shape = oldShape;
-                shapeDrawer->lastShapePosition = &oldShape.position;
+                shapeDrawer->lastShapePosition = oldShape.position;
 
                 if (oldShape.selected && !selected) {
                     shapeDrawer->clearSelectedShapeIndicator(shapeProperties, oldShape);
                 }
             } else {
                 if (!this->shapes.empty()) {
-                    shapeDrawer->lastShapePosition = &(--this->shapes.end())->second.position;
+                    shapeDrawer->lastShapePosition = (--this->shapes.end())->second.position;
                 }
                 // TODO: these parameters are wack
                 XClearArea(windowManager->getDisplay(), windowManager->getWindow(), oldShape.position.x - 2,
@@ -79,6 +79,8 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
         shape.selected = selected;
 
         if (shouldDrawShape) {
+            shapeProperties.position = shapeDrawer->getNextShapePosition(shapeProperties, *windowDimensions);
+            
             try {
                 shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
             } catch (ImageNotLoadable &e) {

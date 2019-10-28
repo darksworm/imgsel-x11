@@ -11,7 +11,7 @@ protected:
 
     ShapeProperties calcShapeProps(Window window) override;
 
-    XPoint *getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) override;
+    XPoint getNextShapePosition(ShapeProperties shapeProperties, Dimensions windowDimensions) override;
 
     void drawSelectedShapeIndicator(ShapeProperties shapeProperties, Shape shape) override;
 
