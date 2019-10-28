@@ -83,6 +83,7 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
             
             try {
                 shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
+                shape.position = shapeProperties.position;
             } catch (ImageNotLoadable &e) {
                 images->erase(it);
                 if (--it < start) {

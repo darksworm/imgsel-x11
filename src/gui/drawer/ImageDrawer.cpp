@@ -65,7 +65,6 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
     imlib_render_image_on_drawable(imagePos.x, imagePos.y);
 
     lastShapePosition = shapeProperties.position;
-    shape.position = lastShapePosition.value();
 
     imlib_free_image();
     XFreePixmap(windowManager->getDisplay(), pix);
@@ -89,8 +88,8 @@ Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions win
             windowManager->getDisplay(),
             windowManager->getWindow(),
             textGC,
-            shape.position.x + shapeProperties.dimensions.x / 2 - textWidth / 2,
-            shape.position.y + shapeProperties.nameRect.y,
+            lastShapePosition.value().x + shapeProperties.dimensions.x / 2 - textWidth / 2,
+            lastShapePosition.value().y + shapeProperties.nameRect.y,
             displayName.c_str(),
             (int) displayName.length()
     );
