@@ -80,10 +80,10 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
 
         if (shouldDrawShape) {
             shapeProperties.position = shapeDrawer->getNextShapePosition(shapeProperties, *windowDimensions);
-            
+            shape.position = shapeProperties.position;
+
             try {
-                shape = shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
-                shape.position = shapeProperties.position;
+                shapeDrawer->drawNextShape(shapeProperties, *windowDimensions, shape);
             } catch (ImageNotLoadable &e) {
                 images->erase(it);
                 if (--it < start) {
