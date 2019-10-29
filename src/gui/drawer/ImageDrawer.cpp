@@ -9,7 +9,7 @@ Shape ImageDrawer::calcNextShape(ShapeProperties properties, Image *hotkey, bool
     return Shape();
 }
 
-Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Dimensions windowDimensions, Shape shape) {
+Shape ImageDrawer::drawNextShape(ShapeProperties shapeProperties, Shape shape) {
     auto config = ConfigManager::getOrLoadConfig();
     Imlib_Image img;
     Pixmap pix;

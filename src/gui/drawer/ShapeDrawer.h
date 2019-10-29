@@ -89,7 +89,7 @@ protected:
 
     virtual Shape calcNextShape(ShapeProperties properties, Image *hotkey, bool selected, long index) = 0;
 
-    virtual Shape drawNextShape(ShapeProperties shapeProperties, Dimensions windowDimensions, Shape shape) = 0;
+    virtual Shape drawNextShape(ShapeProperties shapeProperties, Shape shape) = 0;
 
     virtual ShapeProperties calcShapeProps(Window window) = 0;
 
