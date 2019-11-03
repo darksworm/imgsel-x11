@@ -106,7 +106,10 @@ ShapeProperties ImageDrawer::calcShapeProps(Window window) {
             .itemCounts = Dimensions(config.getCols() > 0 ? config.getCols() : 4,
                                      config.getRows() > 0 ? config.getRows() : 4),
             .nameRect = XRectangle{
-                    .y = static_cast<short>(config.getMaxImageHeight() + config.getYPadding() * 1.5)
+                    .x = 0,
+                    .y = static_cast<short>(config.getMaxImageHeight() + config.getYPadding() * 1.5),
+                    .width = 0,
+                    .height = 0
             },
             .position = XPoint()
     };
