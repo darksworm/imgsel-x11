@@ -46,6 +46,8 @@ void ImagePickerDrawer::drawFrame(Image *selectedImage, bool redrawAll) {
         bool selected = it->getPath() == selectedImage->getPath();
 
         Shape shape{
+                .position = XPoint(),
+                .selected = false,
                 .index = std::distance(images->begin(), it),
                 .image = &*it
         };
