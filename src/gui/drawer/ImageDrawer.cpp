@@ -107,7 +107,8 @@ ShapeProperties ImageDrawer::calcShapeProps(Window window) {
                                      config.getRows() > 0 ? config.getRows() : 4),
             .nameRect = XRectangle{
                     .y = static_cast<short>(config.getMaxImageHeight() + config.getYPadding() * 1.5)
-            }
+            },
+            .position = XPoint()
     };
 
     return shapeProperties;
