@@ -20,6 +20,7 @@ find_library(XTST_LIBRARY Xtst)
 
 find_package(Imlib2)
 find_package(Threads)
+find_package(PNG)
 
 if(!Imlib2_FOUND)
     message( FATAL_ERROR "Imlib2 is required!")
@@ -28,7 +29,7 @@ endif()
 target_link_libraries(${PROJECT_NAME} CLI11::CLI11)
 target_link_libraries(${PROJECT_NAME} spdlog::spdlog)
 target_link_libraries(${PROJECT_NAME} ${XTST_LIBRARY} ${X11_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${XINERAMA_LIBRARIES} stdc++fs)
-target_link_libraries(${PROJECT_NAME} ${Imlib2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${Imlib2_LIBRARIES} ${PNG_LIBRARY})
 target_link_libraries(${PROJECT_NAME} keycode)
 
 if (NOT X11_Xinerama_FOUND)
